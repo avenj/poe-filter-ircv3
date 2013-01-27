@@ -65,6 +65,13 @@ sub new {
   bless $self, $class;
 }
 
+sub clone {
+  my ($self) = @_;
+  my $nself = [@$self];
+  $nself->[BUFFER] = [];
+  bless $nself, ref $self
+}
+
 sub debug {
   my ($self, $value) = @_;
   return $self->[DEBUG] = $value if defined $value;
@@ -80,6 +87,11 @@ sub colonify {
 sub get_one_start {
   my ($self, $raw_lines) = @_;
   push @{ $self->[BUFFER] }, $_ for @$raw_lines;
+}
+
+sub get_pending {
+  my ($self) = @_;
+  @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
 }
 
 sub get_one {
@@ -111,16 +123,11 @@ sub get_one {
 
       push @$events, $event;
     } else {
-      warn "Received line $raw_line that is not IRC protocol\n";
+      warn "Received malformed IRC input: $raw_line\n";
     }
   }
 
   $events
-}
-
-sub get_pending {
-  my ($self) = @_;
-  @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
 }
 
 sub put {
@@ -165,20 +172,13 @@ sub put {
       push @$raw_lines, $raw_line;
       warn "<- $raw_line \n" if $self->[DEBUG];
     } else {
-      warn ref($self) . " non hashref passed to put(): \"$event\"\n";
+      carp "($self) non-HASH passed to put(): '$event'";
       push @$raw_lines, $event if ref $event eq 'SCALAR';
     }
 
   }
 
   $raw_lines
-}
-
-sub clone {
-  my ($self) = @_;
-  my $nself = [@$self];
-  $nself->[BUFFER] = [];
-  bless $nself, ref $self
 }
 
 1;
