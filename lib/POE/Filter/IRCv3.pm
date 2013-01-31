@@ -1,5 +1,4 @@
 package POE::Filter::IRCv3;
-our $VERSION = '0.02';
 
 use strictures 1;
 use Carp;
@@ -46,6 +45,12 @@ my $irc_regex = qr/^
   $g->{'trailing_space'}
 $/x;
 
+
+=pod
+
+=for Pod::Coverage COLONIFY DEBUG BUFFER
+
+=cut
 
 sub COLONIFY () { 0 }
 sub DEBUG    () { 1 }
