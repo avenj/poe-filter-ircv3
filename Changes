@@ -1,4 +1,7 @@
 # Changes for POE::Filter::IRCv3
 
- - 0.01    (27 Jan 2013)
-   Initial release
+0.02    (31 Jan 2013)
+  Missing dependency on 'parent'
+
+0.01    (27 Jan 2013)
+  Initial release
