@@ -18,6 +18,7 @@ Module::Build->subclass(
     'Test::More'    => 0,
   },
   requires => {
+    'parent'        => 0,
     'Carp'          => 0,
     'strictures'    => 1,
     'POE::Filter'   => 0,

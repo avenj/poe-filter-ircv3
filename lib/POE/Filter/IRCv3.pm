@@ -188,13 +188,15 @@ sub put {
 
 =head1 NAME
 
-POE::Filter::IRCv3 - POE::Filter::IRCD with experimental IRCv3 features
+POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
 
 =head1 SYNOPSIS
 
   my $filter = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
+
   ## Raw lines parsed to hashes:
   my $array_of_refs  = $filter->get( [ $line1, $line ... ] );
+
   ## Hashes deparsed to raw lines:
   my $array_of_lines = $filter->put( [ \%hash1, \%hash2 ... ] );
 
@@ -301,6 +303,6 @@ L<POE::Filter::Line>
 
 L<POE::Filter::Stackable>
 
-L<Parse::IRC>
+L<IRC::Toolkit>
 
 =cut
