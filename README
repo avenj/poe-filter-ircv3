@@ -1,0 +1,105 @@
+NAME
+    POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
+
+SYNOPSIS
+      my $filter = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
+
+      ## Raw lines parsed to hashes:
+      my $array_of_refs  = $filter->get( [ $line1, $line ... ] );
+
+      ## Hashes deparsed to raw lines:
+      my $array_of_lines = $filter->put( [ \%hash1, \%hash2 ... ] );
+
+      ## Stacked with a line filter, suitable for Wheel usage, etc:
+      my $ircd = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
+      my $line = POE::Filter::Line->new(
+        InputRegexp   => '\015?\012',
+        OutputLiteral => "\015\012",
+      );
+      my $filter = POE::Filter::Stackable->new(
+        Filters => [ $line, $ircd ],
+      );
+
+DESCRIPTION
+    A POE::Filter for IRC traffic derived from POE::Filter::IRCD.
+
+    Adds support for IRCv3.2 message tags.
+
+    Like any proper POE::Filter, there are no POE-specific bits involved
+    here; the filter can be used stand-alone to parse IRC traffic.
+
+  get_one_start, get_one, get_pending
+    Implement the interface described in POE::Filter.
+
+    See "get".
+
+  get
+      my $events = $filter->get( [ $line, $another, ... ] );
+      for my $event (@$events) {
+        my $cmd = $event->{command};
+        ## See below for other keys available
+      }
+
+    Takes an ARRAY of raw lines and returns an ARRAY of hash references with
+    the following keys:
+
+   command
+    The (uppercased) command or numeric.
+
+   params
+    An ARRAY containing the event parameters.
+
+   prefix
+    The sender prefix, if any.
+
+   tags
+    A HASH of key => value pairs matching IRCv3.2 "message tags" -- see
+    <http://ircv3.atheme.org>.
+
+    Note that a tag can be present, but have an undefined value.
+
+  put
+      my $lines = $filter->put( [ $hash, $another_hash, ... ] );
+      for my $line (@$lines) {
+        ## Direct to socket, etc
+      }
+
+    Takes an ARRAY of hash references matching those described in "get"
+    (documented above) and returns an ARRAY of raw IRC-formatted lines.
+
+   colonify
+    In addition to the keys described in "get", the colonify option can be
+    specified for specific events. This controls whether or not the last
+    parameter will be colon-prefixed even if it is a single word. (Yes, IRC
+    is woefully inconsistent ...)
+
+    Defaults to boolean false (off).
+
+  clone
+    Copy the filter object (with a cleared buffer).
+
+  debug
+    Turn on/off debug output.
+
+AUTHOR
+    Derived from POE::Filter::IRCD, which is copyright Chris Williams and
+    Jonathan Steinert.
+
+    Adapted with IRCv3 extensions and other tweaks by Jon Portnoy
+    <avenj@cobaltirc.org>
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    POE::Filter
+
+    POE::Filter::IRCD
+
+    POE::Filter::Line
+
+    POE::Filter::Stackable
+
+    IRC::Toolkit
+
