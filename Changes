@@ -1,5 +1,8 @@
 # Changes for POE::Filter::IRCv3
 
+0.03    (01 Feb 2013)
+  Fix a broken test (5.17 exposed hash order mistake)
+
 0.02    (31 Jan 2013)
   Missing dependency on 'parent'
 
