@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 9;
 use strict; use warnings qw/FATAL all/;
 
 use POE::Filter::IRCv3;
@@ -23,6 +23,10 @@ for my $event (@{ $filter->get([ $str ]) }) {
   cmp_ok( $event->{params}->[0], 'eq', '#Test', 'param 0 looks ok' );
   cmp_ok( $event->{params}->[1], 'eq', 'This is a test', 'param 1 looks ok' );
   for my $parsed (@{ $filter->put([ $event ]) }) {
-    cmp_ok($parsed, 'eq', $str, 'put() looks ok' );
+    cmp_ok($parsed, '=~', qr/intent=ACTION/, 'parsed has intent=ACTION');
+    cmp_ok($parsed, '=~', qr/znc\.in\/extension=value/, 
+      'parsed has vendor ext' 
+    );
+    cmp_ok($parsed, '=~', qr/foobar/, 'parsed has arbitrary valueless tag' );
   }
 }
