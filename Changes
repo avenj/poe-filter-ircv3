@@ -1,5 +1,8 @@
 # Changes for POE::Filter::IRCv3
 
+0.04    (04 Feb 2013)
+  Whoops. Missing dep on parent . . . again.
+
 0.03    (01 Feb 2013)
   Fix a broken test (5.17 exposed hash order mistake)
 
