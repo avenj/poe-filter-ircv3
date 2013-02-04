@@ -154,9 +154,7 @@ sub put {
           $raw_line .= ' ';
       }
 
-      $raw_line .= ':' . $event->{prefix} . ' '
-        if defined $event->{prefix};
-
+      $raw_line .= ':' . $event->{prefix} . ' ' if $event->{prefix};
       $raw_line .= $event->{command};
 
       if ( ref $event->{params} eq 'ARRAY'
