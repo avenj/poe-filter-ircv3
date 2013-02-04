@@ -155,7 +155,7 @@ sub put {
       }
 
       $raw_line .= ':' . $event->{prefix} . ' '
-        if exists $event->{prefix};
+        if defined $event->{prefix};
 
       $raw_line .= $event->{command};
 
@@ -231,7 +231,7 @@ Construct a new Filter; if the B<colonify> option is true,
 the last parameter will always have a colon prepended.
 (This setting can also be retrieved or changed on-the-fly by calling 
 B<colonify> as a method, or changed for specific events by passing a 
-B<colonify> option to L</put>.)
+B<colonify> option via events passed to L</put>.)
 
 =head2 get_one_start, get_one, get_pending
 
@@ -286,7 +286,9 @@ specified for specific events. This controls whether or not the last
 parameter will be colon-prefixed even if it is a single word. (Yes, IRC is 
 woefully inconsistent ...)
 
-Defaults to boolean false (off).
+Specify as part of the event hash:
+
+  $filter->put([ { %event, colonify => 1 } ]);
 
 =head2 clone
 
