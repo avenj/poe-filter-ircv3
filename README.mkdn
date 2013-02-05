@@ -32,6 +32,14 @@ Like any proper [POE::Filter](http://search.cpan.org/perldoc?POE::Filter), there
 here; the filter can be used stand-alone to parse IRC traffic (see
 [IRC::Toolkit::Parser](http://search.cpan.org/perldoc?IRC::Toolkit::Parser)).
 
+## new
+
+Construct a new Filter; if the __colonify__ option is true, 
+the last parameter will always have a colon prepended.
+(This setting can also be retrieved or changed on-the-fly by calling 
+__colonify__ as a method, or changed for specific events by passing a 
+__colonify__ option via events passed to ["put"](#put).)
+
 ## get\_one\_start, get\_one, get\_pending
 
 Implement the interface described in [POE::Filter](http://search.cpan.org/perldoc?POE::Filter).
@@ -85,7 +93,9 @@ specified for specific events. This controls whether or not the last
 parameter will be colon-prefixed even if it is a single word. (Yes, IRC is 
 woefully inconsistent ...)
 
-Defaults to boolean false (off).
+Specify as part of the event hash:
+
+    $filter->put([ { %event, colonify => 1 } ]);
 
 ## clone
 
