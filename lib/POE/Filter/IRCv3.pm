@@ -59,7 +59,7 @@ sub BUFFER   () { 2 }
 
 sub new {
   my ($class, %params) = @_;
-  $params{uc $_} = delete $params{$_} for keys %params;
+  $params{uc $_} = $params{$_} for keys %params;
 
   my $self = [
     $params{'COLONIFY'} || 0,
