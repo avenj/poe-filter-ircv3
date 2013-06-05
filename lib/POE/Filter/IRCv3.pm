@@ -5,6 +5,47 @@ use Carp;
 
 use parent 'POE::Filter';
 
+my $g = {
+  space           => qr/\x20+/o,
+  trailing_space  => qr/\x20*/o,
+};
+
+my $irc_regex = qr/^
+  (?:
+    \x40                # '@'-prefixed IRCv3.2 messsage tags.
+    (\S+)               # [tags] Semi-colon delimited key=value list
+    $g->{space}
+  )?
+  (?:
+    \x3a                #  : comes before hand
+    (\S+)               #  [prefix]
+    $g->{space}         #  Followed by a space
+  )?                    # but is optional.
+  (
+    \d{3}|[a-zA-Z]+     #  [command]
+  )                     # required.
+  (?:
+    $g->{space}         # Strip leading space off [middle]s
+    (                   # [middle]s
+      (?:
+        [^\x00\x0a\x0d\x20\x3a]
+        [^\x00\x0a\x0d\x20]*
+      )                 # Match on 1 of these,
+      (?:
+        $g->{space}
+        [^\x00\x0a\x0d\x20\x3a]
+        [^\x00\x0a\x0d\x20]*
+      )*                # then match as many of these as possible
+    )
+  )?                    # otherwise dont match at all.
+  (?:
+    $g->{space}\x3a     # Strip off leading spacecolon for [trailing]
+    ([^\x00\x0a\x0d]*)  # [trailing]
+  )?                    # [trailing] is not necessary.
+  $g->{'trailing_space'}
+$/x;
+
+
 =pod
 
 =for Pod::Coverage COLONIFY DEBUG BUFFER
@@ -18,7 +59,7 @@ sub BUFFER   () { 2 }
 
 sub new {
   my ($class, %params) = @_;
-  $params{uc $_} = $params{$_} for keys %params;
+  $params{uc $_} = delete $params{$_} for keys %params;
 
   my $self = [
     $params{'COLONIFY'} || 0,
@@ -58,53 +99,40 @@ sub get_pending {
   @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
 }
 
-sub _parseline {
-  ## Inspired by some Python bits Aerdan wrote:
-  my ($raw_line) = @_;
-  my @input = split ' ', ( $raw_line || return );
-  my %event = ( raw_line => $raw_line );
-
-  if ( index($input[0], '@') == 0 ) {
-    for my $tag_pair (split /;/, substr $input[0], 1) {
-      my ($thistag, $thisval) = split /=/, $tag_pair;
-      $event{tags}->{$thistag} = $thisval
-    }
-    shift @input
-  }
-
-  if ( index($input[0], ':') == 0 ) {
-    $event{prefix} = substr $input[0], 1;
-    shift @input
-  }
-
-  $event{command} = uc( shift(@input) || return );
-
-  PARAM: while (defined (my $param = shift @input)) {
-    if ( index($param, ':') == 0 ) {
-      push @{ $event{params} }, join ' ', substr($param, 1), @input;
-      last PARAM
-    }
-    push @{ $event{params} }, $param;
-  }
-
-  \%event
-}
-
 sub get_one {
   my ($self) = @_;
-  my @events;
+  my $events = [];
 
   if (my $raw_line = shift @{ $self->[BUFFER] }) {
     warn "-> $raw_line \n" if $self->[DEBUG];
 
-    if (my $event = _parseline($raw_line)) {
-      push @events, $event;
+    if ( my($tags, $prefix, $command, $middles, $trailing)
+       = $raw_line =~  m/$irc_regex/ ) {
+
+      my $event = { raw_line => $raw_line };
+
+      if ($tags) {
+        for my $tag_pair (split /;/, $tags) {
+          my ($thistag, $thisval) = split /=/, $tag_pair;
+          $event->{tags}->{$thistag} = $thisval
+        }
+      }
+
+      $event->{prefix}  = $prefix if $prefix;
+      $event->{command} = uc $command;
+
+      push @{ $event->{params} }, split(/$g->{space}/, $middles)
+        if defined $middles;
+      push @{ $event->{params} }, $trailing
+        if defined $trailing;
+
+      push @$events, $event;
     } else {
-      carp "Received malformed IRC input: $raw_line";
+      warn "Received malformed IRC input: $raw_line\n";
     }
   }
 
-  \@events
+  $events
 }
 
 sub put {
@@ -163,7 +191,7 @@ sub put {
 
 =head1 NAME
 
-POE::Filter::IRCv3 - POE IRC filter IRCv3.2 message tags
+POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
 
 =head1 SYNOPSIS
 
@@ -187,12 +215,9 @@ POE::Filter::IRCv3 - POE IRC filter IRCv3.2 message tags
 
 =head1 DESCRIPTION
 
-A L<POE::Filter> for IRC traffic.
+A L<POE::Filter> for IRC traffic derived from L<POE::Filter::IRCD>.
 
 Adds support for IRCv3.2 message tags.
-
-Does not rely on regular expressions for parsing, unlike many of its
-counterparts.
 
 Like any proper L<POE::Filter>, there are no POE-specific bits involved 
 here; the filter can be used stand-alone to parse IRC traffic (see
@@ -273,13 +298,14 @@ Turn on/off debug output.
 
 =head1 AUTHOR
 
-Jon Portnoy <avenj@cobaltirc.org>
+Derived from L<POE::Filter::IRCD>, which is copyright Chris Williams and 
+Jonathan Steinert.
 
-Originally derived from L<POE::Filter::IRCD>, which is copyright Chris
-Williams and Jonathan Steinert; heavily modified since that time, such that
-little original code remains, but I stand on the shoulders of giants ;-)
+Adapted with IRCv3 extensions and other tweaks by Jon Portnoy <avenj@cobaltirc.org>
 
-Licensed under the same terms as Perl.
+This module may be used, modified, and distributed under the same terms as 
+Perl itself. 
+Please see the license that came with your Perl distribution for details.
 
 =head1 SEE ALSO
 
