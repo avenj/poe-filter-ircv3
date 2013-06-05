@@ -61,7 +61,7 @@ sub get_pending {
 sub _parseline {
   ## Inspired by some Python bits Aerdan wrote:
   my ($raw_line) = @_;
-  my @input = split ' ', ( $raw_line || return );
+  my @input = split /\x20/, ( $raw_line || return );
   my %event = ( raw_line => $raw_line );
 
   if ( index($input[0], '@') == 0 ) {
@@ -81,6 +81,10 @@ sub _parseline {
 
   PARAM: while (defined (my $param = shift @input)) {
     if ( index($param, ':') == 0 ) {
+      ## FIXME this is wrong.
+      ##   Instead we need the rindex from the raw_line and substr from there.
+      ##   Elsewise we clobber spaces.
+      ##   Need test for same.
       push @{ $event{params} }, join ' ', substr($param, 1), @input;
       last PARAM
     }
