@@ -60,36 +60,33 @@ sub get_pending {
 
 sub _parseline {
   my ($raw_line) = @_;
-  return unless $raw_line;
-
-  my @input = split ' ', $raw_line;
-
-  my %struct = ( raw_line => $raw_line );
+  my @input = split ' ', ( $raw_line || return );
+  my %event = ( raw_line => $raw_line );
 
   if ( index($input[0], '@') == 0 ) {
     for my $tag_pair (split /;/, substr $input[0], 1) {
       my ($thistag, $thisval) = split /=/, $tag_pair;
-      $struct{tags}->{$thistag} = $thisval
+      $event{tags}->{$thistag} = $thisval
     }
     shift @input
   }
 
   if ( index($input[0], ':') == 0 ) {
-    $struct{prefix} = substr $input[0], 1;
+    $event{prefix} = substr $input[0], 1;
     shift @input
   }
 
-  $struct{command} = uc( shift(@input) || return );
+  $event{command} = uc( shift(@input) || return );
 
   PARAM: while (defined (my $param = shift @input)) {
     if ( index($param, ':') == 0 ) {
-      push @{ $struct{params} }, join ' ', substr($param, 1), @input;
+      push @{ $event{params} }, join ' ', substr($param, 1), @input;
       last PARAM
     }
-    push @{ $struct{params} }, $param;
+    push @{ $event{params} }, $param;
   }
 
-  \%struct
+  \%event
 }
 
 sub get_one {
@@ -99,8 +96,8 @@ sub get_one {
   if (my $raw_line = shift @{ $self->[BUFFER] }) {
     warn "-> $raw_line \n" if $self->[DEBUG];
 
-    if (my $struct = _parseline($raw_line)) {
-      push @events, $struct;
+    if (my $event = _parseline($raw_line)) {
+      push @events, $event;
     } else {
       carp "Received malformed IRC input: $raw_line";
     }
@@ -165,7 +162,7 @@ sub put {
 
 =head1 NAME
 
-POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
+POE::Filter::IRCv3 - POE IRC filter IRCv3.2 message tags
 
 =head1 SYNOPSIS
 
@@ -189,7 +186,7 @@ POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
 
 =head1 DESCRIPTION
 
-A L<POE::Filter> for IRC traffic derived from L<POE::Filter::IRCD>.
+A L<POE::Filter> for IRC traffic.
 
 Adds support for IRCv3.2 message tags.
 
@@ -272,14 +269,13 @@ Turn on/off debug output.
 
 =head1 AUTHOR
 
-Derived from L<POE::Filter::IRCD>, which is copyright Chris Williams and 
-Jonathan Steinert.
+Jon Portnoy <avenj@cobaltirc.org>
 
-Adapted with IRCv3 extensions and other tweaks by Jon Portnoy <avenj@cobaltirc.org>
+Originally derived from L<POE::Filter::IRCD>, which is copyright Chris
+Williams and Jonathan Steinert; heavily modified since that time, such that
+little original code remains, but I stand on the shoulders of giants ;-)
 
-This module may be used, modified, and distributed under the same terms as 
-Perl itself. 
-Please see the license that came with your Perl distribution for details.
+Licensed under the same terms as Perl.
 
 =head1 SEE ALSO
 

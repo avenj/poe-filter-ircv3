@@ -8,18 +8,16 @@ my $with_tags = '@intent=ACTION;znc.in/extension=value;foobar'.
 require POE::Filter::IRCv3;
 require POE::Filter::IRCv3::NoRE;
 
+my $refilter = POE::Filter::IRCv3->new;
+my $filter = POE::Filter::IRCv3::NoRE->new;
 timethese( 200_000, {
 
     regex => sub {
-      my $filter = POE::Filter::IRCv3->new;
-
-      $filter->get([ $basic_raw ]);
-      $filter->get([ $with_tags ]);
+      $refilter->get([ $basic_raw ]);
+      $refilter->get([ $with_tags ]);
     },
 
     string => sub {
-      my $filter = POE::Filter::IRCv3::NoRE->new;
-
       $filter->get([ $basic_raw ]);
       $filter->get([ $with_tags ]);
     },
