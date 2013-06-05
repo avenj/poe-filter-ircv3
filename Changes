@@ -1,8 +1,15 @@
 # Changes for POE::Filter::IRCv3
 
+0.041000   (05 Jun 2013)
+  (0.41.0)
+
+  Switch to a non-regex get_one() implementation.
+  (Benching shows this is slightly faster in many cases.)
+
 
 0.040001   (04 Feb 2013)
   (0.40.1)
+
   Empty-string prefix should DWIM
   Switch to long-format semantic version
 

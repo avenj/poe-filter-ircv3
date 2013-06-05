@@ -1,6 +1,6 @@
 # NAME
 
-POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
+POE::Filter::IRCv3 - POE IRC filter IRCv3.2 message tags
 
 # SYNOPSIS
 
@@ -24,9 +24,12 @@ POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
 
 # DESCRIPTION
 
-A [POE::Filter](http://search.cpan.org/perldoc?POE::Filter) for IRC traffic derived from [POE::Filter::IRCD](http://search.cpan.org/perldoc?POE::Filter::IRCD).
+A [POE::Filter](http://search.cpan.org/perldoc?POE::Filter) for IRC traffic.
 
 Adds support for IRCv3.2 message tags.
+
+Does not rely on regular expressions for parsing, unlike many of its
+counterparts.
 
 Like any proper [POE::Filter](http://search.cpan.org/perldoc?POE::Filter), there are no POE-specific bits involved 
 here; the filter can be used stand-alone to parse IRC traffic (see
@@ -107,14 +110,13 @@ Turn on/off debug output.
 
 # AUTHOR
 
-Derived from [POE::Filter::IRCD](http://search.cpan.org/perldoc?POE::Filter::IRCD), which is copyright Chris Williams and 
-Jonathan Steinert.
+Jon Portnoy <avenj@cobaltirc.org>
 
-Adapted with IRCv3 extensions and other tweaks by Jon Portnoy <avenj@cobaltirc.org>
+Originally derived from [POE::Filter::IRCD](http://search.cpan.org/perldoc?POE::Filter::IRCD), which is copyright Chris
+Williams and Jonathan Steinert; heavily modified since that time, such that
+little original code remains, but I stand on the shoulders of giants ;-)
 
-This module may be used, modified, and distributed under the same terms as 
-Perl itself. 
-Please see the license that came with your Perl distribution for details.
+Licensed under the same terms as Perl.
 
 # SEE ALSO
 
