@@ -60,52 +60,53 @@ sub get_pending {
 
 sub _parseline {
   my ($raw_line) = @_;
+  return unless $raw_line;
 
   my @input = split ' ', $raw_line;
 
-  my $struct = +{ raw_line => $raw_line };
+  my %struct = ( raw_line => $raw_line );
 
   if ( index($input[0], '@') == 0 ) {
     for my $tag_pair (split /;/, substr $input[0], 1) {
       my ($thistag, $thisval) = split /=/, $tag_pair;
-      $struct->{tags}->{$thistag} = $thisval
+      $struct{tags}->{$thistag} = $thisval
     }
     shift @input
   }
 
   if ( index($input[0], ':') == 0 ) {
-    $struct->{prefix} = substr $input[0], 1;
+    $struct{prefix} = substr $input[0], 1;
     shift @input
   }
 
-  $struct->{command} = uc( @input ? shift(@input) : return );
+  $struct{command} = uc( shift(@input) || return );
 
   PARAM: while (defined (my $param = shift @input)) {
     if ( index($param, ':') == 0 ) {
-      push @{ $struct->{params} }, join ' ', substr($param, 1), @input;
+      push @{ $struct{params} }, join ' ', substr($param, 1), @input;
       last PARAM
     }
-    push @{ $struct->{params} }, $param;
+    push @{ $struct{params} }, $param;
   }
 
-  $struct
+  \%struct
 }
 
 sub get_one {
   my ($self) = @_;
-  my $events = [];
+  my @events;
 
   if (my $raw_line = shift @{ $self->[BUFFER] }) {
     warn "-> $raw_line \n" if $self->[DEBUG];
 
     if (my $struct = _parseline($raw_line)) {
-      push @$events, $struct;
+      push @events, $struct;
     } else {
-      warn "Received malformed IRC input: $raw_line\n";
+      carp "Received malformed IRC input: $raw_line";
     }
   }
 
-  $events
+  \@events
 }
 
 sub put {
