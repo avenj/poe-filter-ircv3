@@ -1,4 +1,4 @@
-use Test::More tests => 12;
+use Test::More tests => 13;
 use strict; use warnings qw/FATAL all/;
 
 BEGIN {
@@ -33,4 +33,14 @@ for my $event (@{ $filter->get([ $two ]) }) {
   for my $parsed (@{ $filter->put([ $event ]) }) {
     cmp_ok($parsed, 'eq', $two, 'put() looks ok 2' );
   }
+}
+
+{
+  my @warned;
+  local $SIG{__WARN__} = sub {
+    push @warned, @_;
+  };
+  $filter->get([ ':foo' ]);
+  ok( @warned == 1, 'bad string warned' )
+    or diag explain \@warned;
 }
