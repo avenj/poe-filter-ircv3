@@ -67,10 +67,10 @@ sub _parseline {
   if ( substr($raw_line, $pos, 1) eq '@' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
     return unless $nextsp > 0;
-    my $tag_str = substr $raw_line, ($pos + 1), ($nextsp - 1);
-    for my $tag_pair (split /;/, $tag_str) {
-      my ($thistag, $thisval) = split /=/, $tag_pair;
-      $event{tags}->{$thistag} = $thisval
+    for my $tag_pair 
+      ( split /;/, substr $raw_line, ($pos + 1), ($nextsp - 1) ) {
+          my ($thistag, $thisval) = split /=/, $tag_pair;
+          $event{tags}->{$thistag} = $thisval
     }
     $pos = $nextsp;
   }
