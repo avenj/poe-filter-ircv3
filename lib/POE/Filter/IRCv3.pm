@@ -14,7 +14,7 @@ use parent 'POE::Filter';
 sub COLONIFY () { 0 }
 sub DEBUG    () { 1 }
 sub BUFFER   () { 2 }
-
+sub SPCHR    () { "\x20" }
 
 sub new {
   my ($class, %params) = @_;
@@ -58,7 +58,6 @@ sub get_pending {
   @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
 }
 
-
 sub _parseline {
   my ($raw_line) = @_;
   my %event = ( raw_line => $raw_line );
@@ -66,48 +65,43 @@ sub _parseline {
   my $pos = 0;
 
   if ( substr($raw_line, $pos, 1) eq '@' ) {
-    my $space = index $raw_line, "\x20", $pos;
-    return unless ($space -= 1) > 0;
-    my $tag_str = substr $raw_line, ($pos + 1), $space;
+    my $nextsp = index $raw_line, SPCHR, $pos;
+    return unless $nextsp > 0;
+    my $tag_str = substr $raw_line, ($pos + 1), ($nextsp - 1);
     for my $tag_pair (split /;/, $tag_str) {
       my ($thistag, $thisval) = split /=/, $tag_pair;
       $event{tags}->{$thistag} = $thisval
     }
-    
-    $raw_line = substr $raw_line, ($space + 2);
-    $pos = 0;
+    $pos = $nextsp;
   }
 
-  while ( index($raw_line, "\x20", $pos) == 0) {
+  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
     ++$pos
   }
 
   if ( substr($raw_line, $pos, 1) eq ':' ) {
-    my $space = index $raw_line, "\x20", $pos;
-    return unless ($space -= 1) > 0;
-    $event{prefix} = substr $raw_line, ($pos + 1), $space;
-    
-    $raw_line = substr $raw_line, ($space + 2);
-    $pos = 0;
+    my $nextsp = index $raw_line, SPCHR, $pos;
+    return unless $nextsp > 0;
+    $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1);
+    $pos = $nextsp;
   }
 
-  while ( index($raw_line, "\x20", $pos) == 0) {
-    $pos++
+  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
+    ++$pos
   }
 
-  {
-    my $space = index $raw_line, "\x20", $pos;
-    $event{command} = uc(
-      $space == -1 ?
-        substr $raw_line, $pos
-        : substr $raw_line, $pos, $space
-    );
-    
-    $raw_line = substr $raw_line, ($space + 1);
-    $pos = 0;
+  my $nextsp_maybe = index $raw_line, SPCHR, $pos;
+  if ($nextsp_maybe == -1) {
+    $event{command} = uc( substr($raw_line, $pos) );
+    return \%event
   }
 
-  while ( index($raw_line, "\x20", $pos) == 0) {
+  $event{command} = uc( 
+    substr($raw_line, $pos, ($nextsp_maybe - $pos) )
+  );
+  $pos = $nextsp_maybe;
+
+  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
     $pos++
   }
 
@@ -117,7 +111,7 @@ sub _parseline {
       push @{ $event{params} }, substr $remains, 1;
       last PARAM
     }
-    if ( (my $space = index $remains, "\x20") == -1) {
+    if ( (my $space = index $remains, SPCHR) == -1) {
       push @{ $event{params} }, $remains;
       last PARAM
     } else {
