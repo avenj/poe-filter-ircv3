@@ -78,8 +78,8 @@ sub _parseline {
     $pos = 0;
   }
 
-  while ( substr($raw_line, $pos, 1) eq "\x20" ) {
-    $pos++
+  while ( index($raw_line, "\x20", $pos) == 0) {
+    ++$pos
   }
 
   if ( substr($raw_line, $pos, 1) eq ':' ) {
@@ -91,7 +91,7 @@ sub _parseline {
     $pos = 0;
   }
 
-  while ( substr($raw_line, $pos, 1) eq "\x20" ) {
+  while ( index($raw_line, "\x20", $pos) == 0) {
     $pos++
   }
 
@@ -107,20 +107,19 @@ sub _parseline {
     $pos = 0;
   }
 
-  while ( substr($raw_line, $pos, 1) eq "\x20" ) {
+  while ( index($raw_line, "\x20", $pos) == 0) {
     $pos++
   }
 
   my $remains = substr $raw_line, $pos;
-  PARAM: while (defined $remains && length $remains) {
+  PARAM: while (defined $remains) {
     if ( index($remains, ':') == 0 ) {
       push @{ $event{params} }, substr $remains, 1;
       last PARAM
     }
-    my $space = index $remains, "\x20";
-    if ($space == -1) {
+    if ( (my $space = index $remains, "\x20") == -1) {
       push @{ $event{params} }, $remains;
-      undef $remains;
+      last PARAM
     } else {
       push @{ $event{params} }, substr $remains, 0, $space;
       $remains = substr $remains, ($space + 1)
@@ -130,13 +129,28 @@ sub _parseline {
   \%event
 }
 
+sub get {
+  my ($self, $raw_lines) = @_;
+  my @events;
+
+  for my $raw_line (@$raw_lines) {
+    warn "-> $raw_line \n" if $self->[DEBUG];
+    if (my $event = _parseline($raw_line)) {
+      push @events, $event;
+    } else {
+      carp "Received malformed IRC input: $raw_line";
+    }
+  }
+
+  \@events
+}
+
 sub get_one {
   my ($self) = @_;
   my @events;
 
   if (my $raw_line = shift @{ $self->[BUFFER] }) {
     warn "-> $raw_line \n" if $self->[DEBUG];
-
     if (my $event = _parseline($raw_line)) {
       push @events, $event;
     } else {
@@ -232,7 +246,7 @@ A L<POE::Filter> for IRC traffic.
 Adds support for IRCv3.2 message tags.
 
 Does not rely on regular expressions for parsing, unlike many of its
-counterparts.
+counterparts. Performance is fairly comparable.
 
 Like any proper L<POE::Filter>, there are no POE-specific bits involved 
 here; the filter can be used stand-alone to parse IRC traffic (see
