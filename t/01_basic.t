@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 15;
 use strict; use warnings qw/FATAL all/;
 
 BEGIN {
@@ -33,6 +33,16 @@ for my $event (@{ $filter->get([ $two ]) }) {
   for my $parsed (@{ $filter->put([ $event ]) }) {
     cmp_ok($parsed, 'eq', $two, 'put() looks ok 2' );
   }
+}
+
+my $spaces = ':test PRIVMSG foo :A string   with spaces';
+for my $event (@{ $filter->get([ $spaces ]) } ) {
+  cmp_ok( $event->{params}->[1], 'eq', 'A string   with spaces' );
+}
+
+my $simple = ':test foo';
+for my $event (@{ $filter->get([ $simple ]) } ) {
+  cmp_ok( $event->{command}, 'eq', 'FOO' );
 }
 
 {
