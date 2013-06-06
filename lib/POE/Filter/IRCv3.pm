@@ -74,7 +74,7 @@ sub _parseline {
       $event{tags}->{$thistag} = $thisval
     }
     
-    $raw_line = substr $raw_line, ($space + 1);
+    $raw_line = substr $raw_line, ($space + 2);
     $pos = 0;
   }
 
@@ -87,7 +87,7 @@ sub _parseline {
     return unless ($space -= 1) > 0;
     $event{prefix} = substr $raw_line, ($pos + 1), $space;
     
-    $raw_line = substr $raw_line, ($space + 1);
+    $raw_line = substr $raw_line, ($space + 2);
     $pos = 0;
   }
 
@@ -110,6 +110,7 @@ sub _parseline {
   while ( substr($raw_line, $pos, 1) eq "\x20" ) {
     $pos++
   }
+
   my $remains = substr $raw_line, $pos;
   PARAM: while (defined $remains && length $remains) {
     if ( index($remains, ':') == 0 ) {
@@ -117,9 +118,13 @@ sub _parseline {
       last PARAM
     }
     my $space = index $remains, "\x20";
-    push @{ $event{params} }, 
-      $space == -1 ? $remains : substr $remains, 0, $space; 
-    $remains = substr $remains, ($space + 1);
+    if ($space == -1) {
+      push @{ $event{params} }, $remains;
+      undef $remains;
+    } else {
+      push @{ $event{params} }, substr $remains, 0, $space;
+      $remains = substr $remains, ($space + 1)
+    }
   }
 
   \%event
