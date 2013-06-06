@@ -64,20 +64,22 @@ sub _parseline {
   my %event = ( raw_line => $raw_line );
 
   if ( $input[0] eq '@' ) {
+    shift @input;
     my $space;
-    for my $i ( 1 .. $#input ) {
+    for my $i ( 0 .. $#input ) {
       if ($input[$i] eq "\x20") {
-        $space = $i - 1;
+        $space = $i;
         last
       }
     }
-    my $tag_str = join '', @input[1 ..  ( $space || return )];
+
+    my $tag_str = join '', splice @input, 0, ( $space || return );
+
     for my $tag_pair (split /;/, $tag_str) {
       my ($thistag, $thisval) = split /=/, $tag_pair;
       $event{tags}->{$thistag} = $thisval
     }
     
-    @input = @input[ ($space + 1) .. $#input ];
   }
 
   while ( $input[0] eq "\x20" ) {
@@ -85,16 +87,16 @@ sub _parseline {
   }
 
   if ( $input[0] eq ':' ) {
+    shift @input;
     my $space;
-    for my $i ( 1 .. $#input ) {
+    for my $i ( 0 .. $#input ) {
       if ($input[$i] eq "\x20") {
-        $space = $i - 1;
+        $space = $i;
         last
       }
     }
-    $event{prefix} = join '', @input[1 .. ( $space || return )];
 
-    @input = @input[ ($space + 1) .. $#input ];
+    $event{prefix} = join '', splice @input, 0, ( $space || return );
 
     while ( $input[0] eq "\x20" ) {
       shift @input
@@ -104,14 +106,17 @@ sub _parseline {
   { my $space;
     for my $i ( 1 .. $#input ) {
       if ($input[$i] eq "\x20") {
-        $space = $i - 1;
+        $space = $i;
         last
       }
     }
-    $event{command} = uc( join '', @input[0 .. ( $space || return)] );
 
-    @input = @input[ ($space + 1) .. $#input ];
+    $event{command} = uc(
+      join '', splice @input, 0, ( $space || scalar @input )
+    );
   }
+
+  return \%event unless @input;
 
   while ( $input[0] eq "\x20" ) {
     shift @input
