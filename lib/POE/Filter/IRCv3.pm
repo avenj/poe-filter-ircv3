@@ -59,37 +59,80 @@ sub get_pending {
 }
 
 sub _parseline {
-  ## Inspired by some Python bits Aerdan wrote:
   my ($raw_line) = @_;
-  my @input = split /\x20/, ( $raw_line || return );
+  my @input = split //, ( $raw_line || return );
   my %event = ( raw_line => $raw_line );
 
-  if ( index($input[0], '@') == 0 ) {
-    for my $tag_pair (split /;/, substr $input[0], 1) {
+  if ( $input[0] eq '@' ) {
+    my $space;
+    for my $i ( 1 .. $#input ) {
+      if ($input[$i] eq "\x20") {
+        $space = $i - 1;
+        last
+      }
+    }
+    my $tag_str = join '', @input[1 ..  ( $space || return )];
+    for my $tag_pair (split /;/, $tag_str) {
       my ($thistag, $thisval) = split /=/, $tag_pair;
       $event{tags}->{$thistag} = $thisval
     }
+    
+    @input = @input[ ($space + 1) .. $#input ];
+  }
+
+  while ( $input[0] eq "\x20" ) {
     shift @input
   }
 
-  if ( index($input[0], ':') == 0 ) {
-    $event{prefix} = substr $input[0], 1;
-    shift @input
-  }
-
-  $event{command} = uc( shift(@input) || return );
-
-  PARAM: while (defined (my $param = shift @input)) {
-    if ( index($param, ':') == 0 ) {
-      ## FIXME this is wrong.
-      ##   Instead we need the rindex from the raw_line and substr from there.
-      ##   Elsewise we clobber spaces.
-      ##   Need test for same.
-      push @{ $event{params} }, join ' ', substr($param, 1), @input;
-      last PARAM
+  if ( $input[0] eq ':' ) {
+    my $space;
+    for my $i ( 1 .. $#input ) {
+      if ($input[$i] eq "\x20") {
+        $space = $i - 1;
+        last
+      }
     }
-    push @{ $event{params} }, $param;
+    $event{prefix} = join '', @input[1 .. ( $space || return )];
+
+    @input = @input[ ($space + 1) .. $#input ];
+
+    while ( $input[0] eq "\x20" ) {
+      shift @input
+    }
   }
+
+  { my $space;
+    for my $i ( 1 .. $#input ) {
+      if ($input[$i] eq "\x20") {
+        $space = $i - 1;
+        last
+      }
+    }
+    $event{command} = uc( join '', @input[0 .. ( $space || return)] );
+
+    @input = @input[ ($space + 1) .. $#input ];
+  }
+
+  while ( $input[0] eq "\x20" ) {
+    shift @input
+  }
+
+  my $pstr;
+  PARAMCHR: while (defined (my $chr = shift @input)) {
+    if ($chr eq ':') {
+      push @{ $event{params} }, join '', @input[0 .. $#input];
+      last PARAMCHR
+    }
+    if ($chr eq "\x20") {
+      if (defined $pstr) {
+        push @{ $event{params} }, $pstr;
+        undef $pstr
+      }
+      next PARAMCHR
+    }
+    $pstr .= $chr
+  }
+  push @{ $event{params} }, $pstr if defined $pstr;
 
   \%event
 }
