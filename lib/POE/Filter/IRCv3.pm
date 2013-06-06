@@ -58,86 +58,69 @@ sub get_pending {
   @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
 }
 
+
 sub _parseline {
   my ($raw_line) = @_;
-  my @input = split //, ( $raw_line || return );
   my %event = ( raw_line => $raw_line );
 
-  if ( $input[0] eq '@' ) {
-    shift @input;
-    my $space;
-    for my $i ( 0 .. $#input ) {
-      if ($input[$i] eq "\x20") {
-        $space = $i;
-        last
-      }
-    }
+  my $pos = 0;
 
-    my $tag_str = join '', splice @input, 0, ( $space || return );
-
+  if ( substr($raw_line, $pos, 1) eq '@' ) {
+    my $space = index $raw_line, "\x20", $pos;
+    return unless ($space -= 1) > 0;
+    my $tag_str = substr $raw_line, ($pos + 1), $space;
     for my $tag_pair (split /;/, $tag_str) {
       my ($thistag, $thisval) = split /=/, $tag_pair;
       $event{tags}->{$thistag} = $thisval
     }
     
+    $raw_line = substr $raw_line, ($space + 1);
+    $pos = 0;
   }
 
-  while ( $input[0] eq "\x20" ) {
-    shift @input
+  while ( substr($raw_line, $pos, 1) eq "\x20" ) {
+    $pos++
   }
 
-  if ( $input[0] eq ':' ) {
-    shift @input;
-    my $space;
-    for my $i ( 0 .. $#input ) {
-      if ($input[$i] eq "\x20") {
-        $space = $i;
-        last
-      }
-    }
-
-    $event{prefix} = join '', splice @input, 0, ( $space || return );
-
-    while ( $input[0] eq "\x20" ) {
-      shift @input
-    }
+  if ( substr($raw_line, $pos, 1) eq ':' ) {
+    my $space = index $raw_line, "\x20", $pos;
+    return unless ($space -= 1) > 0;
+    $event{prefix} = substr $raw_line, ($pos + 1), $space;
+    
+    $raw_line = substr $raw_line, ($space + 1);
+    $pos = 0;
   }
 
-  { my $space;
-    for my $i ( 1 .. $#input ) {
-      if ($input[$i] eq "\x20") {
-        $space = $i;
-        last
-      }
-    }
+  while ( substr($raw_line, $pos, 1) eq "\x20" ) {
+    $pos++
+  }
 
+  {
+    my $space = index $raw_line, "\x20", $pos;
     $event{command} = uc(
-      join '', splice @input, 0, ( $space || scalar @input )
+      $space == -1 ?
+        substr $raw_line, $pos
+        : substr $raw_line, $pos, $space
     );
+    
+    $raw_line = substr $raw_line, ($space + 1);
+    $pos = 0;
   }
 
-  return \%event unless @input;
-
-  while ( $input[0] eq "\x20" ) {
-    shift @input
+  while ( substr($raw_line, $pos, 1) eq "\x20" ) {
+    $pos++
   }
-
-  my $pstr;
-  PARAMCHR: while (defined (my $chr = shift @input)) {
-    if ($chr eq ':') {
-      push @{ $event{params} }, join '', @input[0 .. $#input];
-      last PARAMCHR
+  my $remains = substr $raw_line, $pos;
+  PARAM: while (defined $remains && length $remains) {
+    if ( index($remains, ':') == 0 ) {
+      push @{ $event{params} }, substr $remains, 1;
+      last PARAM
     }
-    if ($chr eq "\x20") {
-      if (defined $pstr) {
-        push @{ $event{params} }, $pstr;
-        undef $pstr
-      }
-      next PARAMCHR
-    }
-    $pstr .= $chr
+    my $space = index $remains, "\x20";
+    push @{ $event{params} }, 
+      $space == -1 ? $remains : substr $remains, 0, $space; 
+    $remains = substr $remains, ($space + 1);
   }
-  push @{ $event{params} }, $pstr if defined $pstr;
 
   \%event
 }
