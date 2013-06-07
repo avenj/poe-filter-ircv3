@@ -124,7 +124,7 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
 { my $col = POE::Filter::IRCv3->new(colonify => 1);
   isa_ok( $col, 'POE::Filter', 'colonifying obj' );
 
-  my $str = ':test!me@test.ing PRIVMSG #Test :Single';
+  my $str = ':test FOO :bar';
   my $ev = $col->get([ $str ]);
   my $parsed = $col->put([ $ev->[0] ]);
   cmp_ok( $parsed->[0], 'eq', $str,

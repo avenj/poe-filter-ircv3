@@ -146,6 +146,7 @@ sub _parseline {
   my %event = ( raw_line => $raw_line );
 
   my $pos = 0;
+
   use bytes;
 
   if ( substr($raw_line, $pos, 1) eq '@' ) {
