@@ -333,6 +333,12 @@ Copy the filter object (with a cleared buffer).
 
 Turn on/off debug output.
 
+=head1 CAVEATS
+
+Uses the L<bytes> pragma and operates strictly on bytes; data 'off the wire'
+from IRC is of indeterminate encoding. As far as I am aware, this does the
+right thing, but test cases to the contrary are welcome ;-)
+
 =head1 AUTHOR
 
 Jon Portnoy <avenj@cobaltirc.org>
