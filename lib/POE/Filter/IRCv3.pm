@@ -92,6 +92,9 @@ sub get_one {
 }
 
 
+use bytes;
+
+
 sub put {
   my ($self, $events) = @_;
   my $raw_lines = [];
@@ -123,9 +126,11 @@ sub put {
             $param = shift @params;
           }
           $raw_line .= ':'
-            if $self->[COLONIFY]
-            or $event->{colonify}
-            or $param =~ m/\x20/;
+            if (index($param, SPCHR) != -1)
+            or (
+              defined $event->{colonify} ?
+              $event->{colonify} : $self->[COLONIFY]
+            );
           $raw_line .= $param;
       }
 
@@ -147,8 +152,6 @@ sub _parseline {
   my %event = ( raw_line => $raw_line );
 
   my $pos = 0;
-
-  use bytes;
 
   if ( substr($raw_line, $pos, 1) eq '@' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
@@ -208,6 +211,9 @@ sub _parseline {
 
   \%event
 }
+
+
+no bytes;
 
 
 1;
