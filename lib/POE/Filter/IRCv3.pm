@@ -217,7 +217,7 @@ sub _parseline {
 
 =head1 NAME
 
-POE::Filter::IRCv3 - POE::Filter::IRCD with IRCv3.2 message tags
+POE::Filter::IRCv3 - IRC parser with message tag support
 
 =head1 SYNOPSIS
 
