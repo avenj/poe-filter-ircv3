@@ -24,5 +24,5 @@ my $tests = +{
   },
 };
 
-cmpthese( 50_000, $tests );
-timethese( 50_000, $tests );
+cmpthese( 100_000, $tests );
+timethese( 100_000, $tests );
