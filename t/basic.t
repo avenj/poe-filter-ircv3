@@ -180,4 +180,13 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
   );
 }
 
+{ 
+  use bytes;
+  my $with_b = ":foo PRIVMSG #f\x{df}\x{de}oo\707";
+  my $ev = $filter->get([ $with_b ])->[0];
+  cmp_ok( $ev->{prefix}, 'eq', 'foo', 'bytes get() prefix ok' );
+  cmp_ok( $ev->{command}, 'eq', 'PRIVMSG', 'bytes get() command ok' );
+  ok( $ev->{params}->[0] eq "#f\x{df}\x{de}oo\707", 'bytes get() params ok' );
+}
+
 done_testing;

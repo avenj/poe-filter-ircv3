@@ -142,11 +142,11 @@ sub put {
 
 
 sub _parseline {
-  use bytes;
   my ($raw_line) = @_;
   my %event = ( raw_line => $raw_line );
 
   my $pos = 0;
+  use bytes;
 
   if ( substr($raw_line, $pos, 1) eq '@' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
