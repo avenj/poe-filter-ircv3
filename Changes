@@ -1,5 +1,11 @@
 # Changes for POE::Filter::IRCv3
 
+0.042001   (07 Jun 2013)
+  (0.42.1)
+
+  Fix per-event 'colonify =>' configurable; tests for same
+
+
 0.042000   (07 Jun 2013)
   (0.42.0)
 
