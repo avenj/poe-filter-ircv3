@@ -15,7 +15,15 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
         raw_line => $simple,
       } 
     ],
-    'simple prefix and command ok'
+    'simple prefix and command get() ok'
+  );
+
+  $filter->get_one_start([ $simple ]);
+  my $started = $filter->get_one;
+  is_deeply(
+    $started,
+    $ev,
+    'get_one_start/get_one ok'
   );
 }
 
