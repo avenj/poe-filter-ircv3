@@ -58,70 +58,6 @@ sub get_pending {
   @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
 }
 
-sub _parseline {
-  my ($raw_line) = @_;
-  my %event = ( raw_line => $raw_line );
-
-  my $pos = 0;
-
-  if ( substr($raw_line, $pos, 1) eq '@' ) {
-    my $nextsp = index $raw_line, SPCHR, $pos;
-    return unless $nextsp > 0;
-    for my $tag_pair 
-      ( split /;/, substr $raw_line, ($pos + 1), ($nextsp - 1) ) {
-          my ($thistag, $thisval) = split /=/, $tag_pair;
-          $event{tags}->{$thistag} = $thisval
-    }
-    $pos = $nextsp;
-  }
-
-  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
-    ++$pos
-  }
-
-  if ( substr($raw_line, $pos, 1) eq ':' ) {
-    my $nextsp = index $raw_line, SPCHR, $pos;
-    return unless $nextsp > 0;
-    $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1);
-    $pos = $nextsp;
-  }
-
-  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
-    ++$pos
-  }
-
-  my $nextsp_maybe = index $raw_line, SPCHR, $pos;
-  if ($nextsp_maybe == -1) {
-    $event{command} = uc( substr($raw_line, $pos) );
-    return \%event
-  }
-
-  $event{command} = uc( 
-    substr($raw_line, $pos, ($nextsp_maybe - $pos) )
-  );
-  $pos = $nextsp_maybe;
-
-  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
-    $pos++
-  }
-
-  my $remains = substr $raw_line, $pos;
-  PARAM: while (defined $remains) {
-    if ( index($remains, ':') == 0 ) {
-      push @{ $event{params} }, substr $remains, 1;
-      last PARAM
-    }
-    if ( (my $space = index $remains, SPCHR) == -1) {
-      push @{ $event{params} }, $remains;
-      last PARAM
-    } else {
-      push @{ $event{params} }, substr $remains, 0, $space;
-      $remains = substr $remains, ($space + 1)
-    }
-  }
-
-  \%event
-}
 
 sub get {
   my ($self, $raw_lines) = @_;
@@ -203,6 +139,74 @@ sub put {
 
   $raw_lines
 }
+
+
+sub _parseline {
+  use bytes;
+  my ($raw_line) = @_;
+  my %event = ( raw_line => $raw_line );
+
+  my $pos = 0;
+
+  if ( substr($raw_line, $pos, 1) eq '@' ) {
+    my $nextsp = index $raw_line, SPCHR, $pos;
+    return unless $nextsp > 0;
+    for my $tag_pair 
+      ( split /;/, substr $raw_line, ($pos + 1), ($nextsp - 1) ) {
+          my ($thistag, $thisval) = split /=/, $tag_pair;
+          $event{tags}->{$thistag} = $thisval
+    }
+    $pos = $nextsp;
+  }
+
+  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
+    ++$pos
+  }
+
+  if ( substr($raw_line, $pos, 1) eq ':' ) {
+    my $nextsp = index $raw_line, SPCHR, $pos;
+    return unless $nextsp > 0;
+    $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1);
+    $pos = $nextsp;
+  }
+
+  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
+    ++$pos
+  }
+
+  my $nextsp_maybe = index $raw_line, SPCHR, $pos;
+  if ($nextsp_maybe == -1) {
+    $event{command} = uc( substr($raw_line, $pos) );
+    return \%event
+  }
+
+  $event{command} = uc( 
+    substr($raw_line, $pos, ($nextsp_maybe - $pos) )
+  );
+  $pos = $nextsp_maybe;
+
+  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
+    $pos++
+  }
+
+  my $remains = substr $raw_line, $pos;
+  PARAM: while (defined $remains) {
+    if ( index($remains, ':') == 0 ) {
+      push @{ $event{params} }, substr $remains, 1;
+      last PARAM
+    }
+    if ( (my $space = index $remains, SPCHR) == -1) {
+      push @{ $event{params} }, $remains;
+      last PARAM
+    } else {
+      push @{ $event{params} }, substr $remains, 0, $space;
+      $remains = substr $remains, ($space + 1)
+    }
+  }
+
+  \%event
+}
+
 
 1;
 
