@@ -223,18 +223,22 @@ POE::Filter::IRCv3 - IRC parser with message tag support
 
   my $filter = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
 
-  ## Raw lines parsed to hashes:
+  # Raw lines parsed to hashes:
   my $array_of_refs  = $filter->get( [ $line1, $line ... ] );
 
-  ## Hashes deparsed to raw lines:
+  # Hashes deparsed to raw lines:
   my $array_of_lines = $filter->put( [ \%hash1, \%hash2 ... ] );
 
-  ## Stacked with a line filter, suitable for Wheel usage, etc:
+
+  # Stacked with a line filter, suitable for Wheel usage, etc:
+
   my $ircd = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
+
   my $line = POE::Filter::Line->new(
     InputRegexp   => '\015?\012',
     OutputLiteral => "\015\012",
   );
+
   my $filter = POE::Filter::Stackable->new(
     Filters => [ $line, $ircd ],
   );
