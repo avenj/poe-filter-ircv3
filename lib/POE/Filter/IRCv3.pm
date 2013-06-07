@@ -5,50 +5,9 @@ use Carp;
 
 use parent 'POE::Filter';
 
-my $g = {
-  space           => qr/\x20+/o,
-  trailing_space  => qr/\x20*/o,
-};
-
-my $irc_regex = qr/^
-  (?:
-    \x40                # '@'-prefixed IRCv3.2 messsage tags.
-    (\S+)               # [tags] Semi-colon delimited key=value list
-    $g->{space}
-  )?
-  (?:
-    \x3a                #  : comes before hand
-    (\S+)               #  [prefix]
-    $g->{space}         #  Followed by a space
-  )?                    # but is optional.
-  (
-    \d{3}|[a-zA-Z]+     #  [command]
-  )                     # required.
-  (?:
-    $g->{space}         # Strip leading space off [middle]s
-    (                   # [middle]s
-      (?:
-        [^\x00\x0a\x0d\x20\x3a]
-        [^\x00\x0a\x0d\x20]*
-      )                 # Match on 1 of these,
-      (?:
-        $g->{space}
-        [^\x00\x0a\x0d\x20\x3a]
-        [^\x00\x0a\x0d\x20]*
-      )*                # then match as many of these as possible
-    )
-  )?                    # otherwise dont match at all.
-  (?:
-    $g->{space}\x3a     # Strip off leading spacecolon for [trailing]
-    ([^\x00\x0a\x0d]*)  # [trailing]
-  )?                    # [trailing] is not necessary.
-  $g->{'trailing_space'}
-$/x;
-
-
 =pod
 
-=for Pod::Coverage COLONIFY DEBUG BUFFER
+=for Pod::Coverage COLONIFY DEBUG BUFFER SPCHR
 
 =cut
 
@@ -62,8 +21,8 @@ sub new {
   $params{uc $_} = delete $params{$_} for keys %params;
 
   my $self = [
-    $params{'COLONIFY'} || 0,
-    $params{'DEBUG'}    || 0,
+    ($params{'COLONIFY'} || 0),
+    ($params{'DEBUG'}    || 0),
     []  ## BUFFER
   ];
 
