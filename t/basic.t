@@ -139,6 +139,35 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
     'colonifying put() looks ok'
   );
 
+  my $withsp = $col->put([
+    +{
+       colonify => 0,
+
+       command => 'FOO',
+       params  => [
+         'foo',
+         'A string'
+       ],
+     }
+  ]);
+  cmp_ok( $withsp->[0], 'eq', 'FOO foo :A string',
+    'colonified string with spaces'
+  );
+
+  my $withoutsp = $col->put([
+      +{
+        colonify => 0,
+
+        command => 'FOO',
+        params  => [
+          'foo',
+        ],
+      }
+  ]);
+  cmp_ok( $withoutsp->[0], 'eq', 'FOO foo',
+    'skipped colonify ok'
+  );    
+
   my $cloned = $col->clone;
   isa_ok( $cloned, 'POE::Filter::IRCv3', 'cloned obj' );
 
@@ -201,6 +230,11 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
   );
   ok( $ev->{params}->[0] eq "#f\x{df}\x{de}oo\707\0", 
     'bytes get() params ok' 
+  );
+
+  $ev->{colonify} = 0;
+  ok( $filter->put([ $ev ])->[0] eq $with_b,
+    "bytes round-tripped ok"
   );
 }
 
