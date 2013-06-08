@@ -235,22 +235,47 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
   my $filter = POE::Filter::IRCv3->new(colonify => 1);
 
   # Raw lines parsed to hashes:
-  my $array_of_refs  = $filter->get( [ $line1, $line ... ] );
+  my $array_of_refs  = $filter->get( 
+    [ 
+      ':prefix COMMAND foo :bar',
+      '@foo=bar;baz :prefix COMMAND foo :bar',
+    ]
+  );
 
   # Hashes deparsed to raw lines:
-  my $array_of_lines = $filter->put( [ \%hash1, \%hash2 ... ] );
+  my $array_of_lines = $filter->put( 
+    [
+      {
+        prefix  => 'prefix',
+        command => 'COMMAND',
+        params  => [
+          'foo',
+          'bar'
+        ],
+      },
+      {
+        prefix  => 'prefix',
+        command => 'COMMAND',
+        params  => [
+          'foo',
+          'bar'
+        ],
+        tags => {
+          foo => 'bar',
+          baz => undef,
+        },
+      },
+    ] 
+  );
 
 
   # Stacked with a line filter, suitable for Wheel usage, etc:
-
   my $ircd = POE::Filter::IRCv3->new(colonify => 1);
-
   my $line = POE::Filter::Line->new(
     InputRegexp   => '\015?\012',
     OutputLiteral => "\015\012",
   );
-
-  my $filter = POE::Filter::Stackable->new(
+  my $stacked = POE::Filter::Stackable->new(
     Filters => [ $line, $ircd ],
   );
 
