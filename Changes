@@ -1,5 +1,11 @@
 # Changes for POE::Filter::IRCv3
 
+0.042003   (08 Jun 2013)
+  (0.42.3)
+
+  POD fixes; leftovers from ancient import (how did that get there?)
+
+
 0.042002   (08 Jun 2013)
   (0.42.2)
 
