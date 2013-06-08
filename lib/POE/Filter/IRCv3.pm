@@ -166,9 +166,7 @@ sub _parseline {
     $pos = $nextsp + 1;
   }
 
-  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
-    ++$pos
-  }
+  $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   if ( substr($raw_line, $pos, 1) eq ':' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
@@ -177,9 +175,7 @@ sub _parseline {
     $pos = $nextsp + 1;
   }
 
-  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
-    ++$pos
-  }
+  $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   my $nextsp_maybe = index $raw_line, SPCHR, $pos;
   if ($nextsp_maybe == -1) {
@@ -194,9 +190,7 @@ sub _parseline {
   );
   $pos = $nextsp_maybe + 1;
 
-  while ( substr($raw_line, $pos, 1) eq SPCHR ) {
-    $pos++
-  }
+  $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   my $remains = substr $raw_line, $pos;
   PARAM: while (defined $remains and length $remains) {
