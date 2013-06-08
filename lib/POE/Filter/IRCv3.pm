@@ -153,7 +153,7 @@ sub _parseline {
   my $pos = 0;
   no warnings 'substr';
 
-  if ( substr($raw_line, $pos, 1) eq '@' ) {
+  if ( substr($raw_line, 0, 1) eq '@' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
     return unless $nextsp > 0;
     for my $tag_pair 
@@ -171,9 +171,8 @@ sub _parseline {
     return unless $nextsp > 0;
     $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1);
     $pos = $nextsp + 1;
+    $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
   }
-
-  $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   my $nextsp_maybe = index $raw_line, SPCHR, $pos;
   if ($nextsp_maybe == -1) {

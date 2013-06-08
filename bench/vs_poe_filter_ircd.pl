@@ -15,12 +15,12 @@ my ($ev_new_one, $ev_new_two);
 my $get_tests = +{
   old_get => sub {
     $ev_old_one = $old->get([ $basic ]);
-    $ev_old_two = $old->get([ ':foo bar' ]);
+    $ev_old_two = $old->get([ 'foo bar' ]);
   },
 
   new_get => sub {
     $ev_new_one = $new->get([ $basic ]);
-    $ev_new_two = $new->get([ ':foo bar' ]);
+    $ev_new_two = $new->get([ 'foo bar' ]);
   },
 };
 
