@@ -195,7 +195,7 @@ sub _parseline {
   }
 
   my $remains = substr $raw_line, $pos;
-  PARAM: while (defined $remains) {
+  PARAM: while (defined $remains and length $remains) {
     if ( index($remains, ':') == 0 ) {
       push @{ $event{params} }, substr $remains, 1;
       last PARAM
@@ -223,7 +223,7 @@ no bytes;
 
 =head1 NAME
 
-POE::Filter::IRCv3 - IRC parser with message tag support
+POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
 
 =head1 SYNOPSIS
 

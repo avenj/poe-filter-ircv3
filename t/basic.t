@@ -27,6 +27,20 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
   );
 }
 
+{ my $trailing = ':test foo  ';
+  my $ev = $filter->get([ $trailing ]);
+  is_deeply( $ev,
+    [
+      +{
+        prefix  => 'test',
+        command => 'FOO',
+        raw_line => $trailing,
+      }
+    ],
+    'simple prefix and cmd with trailing space ok'
+  ) or diag explain $ev;
+}
+
 { my $pfix = ':test!me@test.ing PRIVMSG #Test :This is a test';
   my $ev = $filter->get([ $pfix ]);
   is_deeply( $ev,
