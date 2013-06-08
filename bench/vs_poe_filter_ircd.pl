@@ -6,23 +6,39 @@ require POE::Filter::IRCv3;
 my $old = POE::Filter::IRCD->new;
 my $new = POE::Filter::IRCv3->new;
 
-my $basic = ':test!me@test.ing PRIVMSG #Test :This is a test';
+my $basic = ':test!me@test.ing PRIVMSG #Test :This is a test'
+            .' but not of the emergency broadcast system'
+            .' foo bar baz quux snarf';
 
-my $tests = +{
-  old => sub {
-    my $ev_one = $old->get([$basic]);
-    $old->put([ @$ev_one ]);
-    my $ev_two = $old->get([':foo bar']);
-    $old->put([ @$ev_two ]);
+my ($ev_old_one, $ev_old_two);
+my ($ev_new_one, $ev_new_two);
+my $get_tests = +{
+  old_get => sub {
+    $ev_old_one = $old->get([ $basic ]);
+    $ev_old_two = $old->get([ ':foo bar' ]);
   },
 
-  new => sub {
-    my $ev_one = $new->get([$basic]);
-    $new->put([ @$ev_one ]);
-    my $ev_two = $new->get([':foo bar']);
-    $new->put([ @$ev_two ]);
+  new_get => sub {
+    $ev_new_one = $new->get([ $basic ]);
+    $ev_new_two = $new->get([ ':foo bar' ]);
   },
 };
 
-cmpthese( 100_000, $tests );
-timethese( 100_000, $tests );
+cmpthese( 200_000, $get_tests );
+timethese( 200_000, $get_tests );
+
+my $put_tests = +{
+  old_put => sub {
+    my $foo = $new->put([ @$ev_old_one ]);
+    my $bar = $new->put([ @$ev_old_two ]);
+  },
+
+  new_put => sub {
+    $new->put([ @$ev_new_one ]);
+    $new->put([ @$ev_new_two ]);
+  },
+};
+
+cmpthese( 200_000, $put_tests );
+timethese( 200_000, $put_tests );
+
