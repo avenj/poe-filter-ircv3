@@ -62,17 +62,14 @@ use Test::Deep::NoTest qw/
 
 use base 'Exporter';
 our @EXPORT = qw/
-  cmp_deeply
-
   get_ok
+  put_ok
 
   get_command_ok
   get_prefix_ok
   get_params_ok
   get_rawline_ok
   get_tags_ok
-
-  put_ok
 /;
 
 my $Test = Test::Builder->new;
@@ -186,7 +183,8 @@ sub get_prefix_ok {
     Carp::croak "get_prefix_ok expected blessed filter obj"
   }
 
-  unless (defined $line && defined $pfx) {
+  # undef prefix is a valid comparison:
+  unless (defined $line) {
     Carp::croak "get_prefix_ok expected a line to process and prefix to compare"
   }
 
@@ -250,7 +248,7 @@ sub get_tags_ok {
     Carp::croak "get_tags_ok expected blessed filter obj"
   }
 
-  unless (defined $line && ref $tags eq 'HASH') {
+  unless (defined $line) {
     Carp::croak "get_tags_ok expected a line to process and a tags HASH to compare"
   }
 
