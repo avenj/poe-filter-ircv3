@@ -153,7 +153,10 @@ sub _parseline {
 
   my $pos = 0;
 
+  no warnings 'substr';
+
   if ( substr($raw_line, $pos, 1) eq '@' ) {
+    # Have tags.
     my $nextsp = index $raw_line, SPCHR, $pos;
     return unless $nextsp > 0;
     for my $tag_pair 
@@ -161,7 +164,7 @@ sub _parseline {
           my ($thistag, $thisval) = split /=/, $tag_pair;
           $event{tags}->{$thistag} = $thisval
     }
-    $pos = $nextsp;
+    $pos = $nextsp + 1;
   }
 
   while ( substr($raw_line, $pos, 1) eq SPCHR ) {
@@ -172,7 +175,7 @@ sub _parseline {
     my $nextsp = index $raw_line, SPCHR, $pos;
     return unless $nextsp > 0;
     $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1);
-    $pos = $nextsp;
+    $pos = $nextsp + 1;
   }
 
   while ( substr($raw_line, $pos, 1) eq SPCHR ) {
@@ -181,14 +184,16 @@ sub _parseline {
 
   my $nextsp_maybe = index $raw_line, SPCHR, $pos;
   if ($nextsp_maybe == -1) {
-    $event{command} = uc( substr($raw_line, $pos) );
+    # No more spaces; do we have anything..?
+    my $cmd = substr $raw_line, $pos;
+    $event{command} = uc( length $cmd ? $cmd : return );
     return \%event
   }
 
   $event{command} = uc( 
     substr($raw_line, $pos, ($nextsp_maybe - $pos) )
   );
-  $pos = $nextsp_maybe;
+  $pos = $nextsp_maybe + 1;
 
   while ( substr($raw_line, $pos, 1) eq SPCHR ) {
     $pos++
