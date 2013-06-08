@@ -41,6 +41,25 @@ my $filter = new_ok( 'POE::Filter::IRCv3' );
   ) or diag explain $ev;
 }
 
+{
+  my $param_wcol = ':test PRIVMSG #fo:oo :This is a test';
+  my $ev = $filter->get([ $param_wcol ]);
+  is_deeply( $ev,
+    [
+      +{
+        prefix  => 'test',
+        command => 'PRIVMSG',
+        params  => [
+          '#fo:oo',
+          'This is a test'
+        ],
+        raw_line => $param_wcol,
+      }
+    ],
+    'params containing colons ok'
+  );
+}
+
 { my $pfix = ':test!me@test.ing PRIVMSG #Test :This is a test';
   my $ev = $filter->get([ $pfix ]);
   is_deeply( $ev,
