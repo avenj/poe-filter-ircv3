@@ -148,11 +148,9 @@ sub put {
 
 
 sub _parseline {
-  my ($raw_line) = @_;
+  my $raw_line = $_[0];
   my %event = ( raw_line => $raw_line );
-
   my $pos = 0;
-
   no warnings 'substr';
 
   if ( substr($raw_line, $pos, 1) eq '@' ) {
