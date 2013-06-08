@@ -232,7 +232,7 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
 
 =head1 SYNOPSIS
 
-  my $filter = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
+  my $filter = POE::Filter::IRCv3->new(colonify => 1);
 
   # Raw lines parsed to hashes:
   my $array_of_refs  = $filter->get( [ $line1, $line ... ] );
@@ -243,7 +243,7 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
 
   # Stacked with a line filter, suitable for Wheel usage, etc:
 
-  my $ircd = IRC::Server::Pluggable::IRC::Filter->new(colonify => 1);
+  my $ircd = POE::Filter::IRCv3->new(colonify => 1);
 
   my $line = POE::Filter::Line->new(
     InputRegexp   => '\015?\012',
