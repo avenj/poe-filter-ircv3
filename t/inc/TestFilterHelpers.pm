@@ -4,7 +4,6 @@ use strict; use warnings FATAL => 'all';
 require Carp;
 require Scalar::Util;
 
-
 =pod
 
 =head1 NAME
@@ -96,6 +95,15 @@ sub _looks_ok {
   my ($ok, $stack) = cmp_details($got, $expected);
 
   unless ( $Test->ok($ok, $name) && return 1 ) {
+    if (ref $got && ref $expected) {
+      $Test->diag( "Structures:\n",
+        "Expected ->\n",
+        $Test->explain($expected),
+        "Got ->\n",
+        $Test->explain($got),
+      )
+    }
+
     $Test->diag( deep_diag($stack) )
   }
 
