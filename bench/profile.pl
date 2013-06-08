@@ -8,11 +8,10 @@ my $new = POE::Filter::IRCv3->new;
 
 my $basic = ':test!me@test.ing PRIVMSG #Test :This is a test';
 
-my $tests = +{
-  new => sub {
+sub test {
     $new->get([$basic]);
     $new->get([':foo bar']);
-  },
-};
+    $new->get(['@foo=bar;baz :test PRIVMSG #quux :chickens. ']);
+}
 
-$tests->{new}->() for 1 .. 40_000;
+test for 1 .. 40_000;
