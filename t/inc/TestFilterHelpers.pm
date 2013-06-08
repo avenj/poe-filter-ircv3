@@ -4,6 +4,56 @@ use strict; use warnings FATAL => 'all';
 use Carp 'croak';
 require Scalar::Util;
 
+
+=pod
+
+=head1 NAME
+
+TestFilterHelpers - POE::Filter::IRC(d,v3) test helpers
+
+=head1 SYNOPSIS
+
+  use Test::More;
+  use lib 't/inc';
+  use TestFilterHelpers;
+
+  my $line = ':test foo';
+  get_ok $filter, $line =>
+    +{
+        raw_line => $line,
+        command  => 'FOO',
+        prefix   => 'test',
+    },
+    'my get test ok' ;
+
+  put_ok $filter, $line =>
+    +{ command => 'foo', prefix => 'test' },
+    'my put test ok' ;
+
+  get_command_ok $filter, $line => $cmd, $name;
+
+  get_prefix_ok $filter, $line => $prefix, $name;
+
+  get_params_ok $filter, $line => [@params], $name;
+
+  get_rawline_ok $filter, $line, $name;
+
+  get_tags_ok $filter, $line => +{%tags}, $name;
+
+  done_testing;
+
+=head1 DESCRIPTION
+
+A simple set of helpers for testing L<POE::Filter::IRCv3> (and
+L<POE::Filter::IRCD>).
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut
+
+
 use Test::Deep::NoTest qw/
   cmp_deeply
 
@@ -15,7 +65,7 @@ use base 'Exporter';
 our @EXPORT = qw/
   cmp_deeply
 
-  get_struct_ok
+  get_ok
 
   get_command_ok
   get_prefix_ok
@@ -69,19 +119,20 @@ sub put_ok {
     unless defined $arr->[0];
 
   $name = 'line looks ok' unless defined $name;
-  _looks_ok( $arr, [ $line ], $name )
+
+  _looks_ok( $arr, [ $line ], $name ) ? $arr->[0] : ()
 }
 
 
-sub get_struct_ok {
+sub get_ok {
   my ($filter, $line, $ref, $name) = @_;
 
   unless (Scalar::Util::blessed $filter) {
-    croak "get_struct_ok expected blessed filter obj"
+    croak "get_ok expected blessed filter obj"
   }
 
   unless (defined $line && ref $ref eq 'HASH') {
-    croak "get_struct_ok expected a line to process and HASH to compare"      
+    croak "get_ok expected a line to process and HASH to compare"      
   }
 
   $ref->{raw_line} = $line unless exists $ref->{raw_line};
@@ -92,7 +143,7 @@ sub get_struct_ok {
     unless ref $arr eq 'ARRAY';
 
   $name = 'struct looks ok' unless defined $name;
-  _looks_ok( $arr, [$ref], $name )
+  _looks_ok( $arr, [$ref], $name ) ? $arr->[0] : ()
 }
 
 
