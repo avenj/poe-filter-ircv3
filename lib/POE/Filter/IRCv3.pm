@@ -156,7 +156,6 @@ sub _parseline {
   no warnings 'substr';
 
   if ( substr($raw_line, $pos, 1) eq '@' ) {
-    # Have tags.
     my $nextsp = index $raw_line, SPCHR, $pos;
     return unless $nextsp > 0;
     for my $tag_pair 
