@@ -200,7 +200,8 @@ sub _parseline {
       last PARAM
     } else {
       push @{ $event{params} }, substr $remains, 0, $space;
-      $remains = substr $remains, ($space + 1)
+      $remains = substr $remains, ($space + 1);
+      $remains = substr($remains, 1) while index($remains, SPCHR) == 0
     }
   }
 
