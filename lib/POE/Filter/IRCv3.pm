@@ -277,8 +277,8 @@ A L<POE::Filter> for IRC traffic with support for IRCv3.2 message tags.
 Does not rely on regular expressions for parsing, unlike many of its
 counterparts; benchmarks show this approach is slightly faster on most strings.
 
-Like any proper L<POE::Filter>, there are no POE-specific bits involved 
-here -- the filter can be used stand-alone to parse lines of IRC traffic (see
+Like any proper L<POE::Filter>, there are no POE-specific bits involved here
+-- the filter can be used stand-alone to parse lines of IRC traffic (also see
 L<IRC::Toolkit::Parser>).
 
 =head2 new
