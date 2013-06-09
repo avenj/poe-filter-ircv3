@@ -193,7 +193,7 @@ sub _parseline {
   $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   my $remains = substr $raw_line, $pos;
-  PARAM: while (defined $remains and length $remains) {
+  PARAM: while (defined $remains && length $remains) {
     if ( index($remains, ':') == 0 ) {
       push @{ $event{params} }, substr $remains, 1;
       last PARAM
@@ -209,9 +209,10 @@ sub _parseline {
   }
 
 ## This is one way to do it without consuming the rest of the string,
-## but the string-consuming method above wins on performance.
+## but the string-consuming method above wins on performance on
+## most common IRC strings (which typically have few params)
 ##
-#  PARAM: while ( length substr($raw_line, $pos, 1) ) {
+#  PARAM: while ( $pos < length $raw_line ) {
 #    ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
 #    if (substr($raw_line, $pos, 1) eq ':') {
 #      push @{ $event{params} }, substr $raw_line, ($pos + 1);
