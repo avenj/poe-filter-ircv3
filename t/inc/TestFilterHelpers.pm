@@ -43,8 +43,8 @@ TestFilterHelpers - POE::Filter::IRC(d,v3) test helpers
 
 =head1 DESCRIPTION
 
-A simple set of helpers for testing L<POE::Filter::IRCv3> (and
-L<POE::Filter::IRCD>).
+A simple set of L<Test::Deep> and L<Test::Builder> based helpers for testing
+L<POE::Filter::IRCv3> (and L<POE::Filter::IRCD>).
 
 =head1 AUTHOR
 
@@ -127,7 +127,8 @@ sub put_ok {
 
   $name = 'line looks ok' unless defined $name;
 
-  _looks_ok( $arr, [ $line ], $name ) ? $arr->[0] : ()
+  _looks_ok( $arr, [ $line ], $name ) ? 
+    $arr->[0] : ()
 }
 
 
@@ -150,7 +151,8 @@ sub get_ok {
     unless ref $arr eq 'ARRAY';
 
   $name = 'struct looks ok' unless defined $name;
-  _looks_ok( $arr, [$ref], $name ) ? $arr->[0] : ()
+  _looks_ok( $arr, [$ref], $name ) ? 
+    $arr->[0] : ()
 }
 
 
@@ -173,7 +175,8 @@ sub get_command_ok {
     unless ref $arr->[0] eq 'HASH';
 
   $name = 'command looks ok' unless defined $name;
-  _looks_ok( $arr->[0]->{command}, $cmd, $name )
+  _looks_ok( $arr->[0]->{command}, $cmd, $name ) ? 
+    $cmd : ()
 }
 
 sub get_prefix_ok {
@@ -195,7 +198,8 @@ sub get_prefix_ok {
     unless ref $arr->[0] eq 'HASH';
 
   $name = 'prefix looks ok' unless defined $name;
-  _looks_ok( $arr->[0]->{prefix}, $pfx, $name )
+  _looks_ok( $arr->[0]->{prefix}, $pfx, $name ) ? 
+    $pfx : ()
 }
 
 sub get_params_ok {
@@ -217,7 +221,8 @@ sub get_params_ok {
     unless ref $arr->[0] eq 'HASH';
 
   $name = 'params look ok' unless defined $name;
-  _looks_ok( $arr->[0]->{params}, $pref, $name )
+  _looks_ok( $arr->[0]->{params}, $pref, $name ) ? 
+    $arr->[0]->{params} : ()
 }
 
 sub get_rawline_ok {
@@ -238,7 +243,8 @@ sub get_rawline_ok {
     unless ref $arr->[0] eq 'HASH';
 
   $name = 'raw_line looks ok' unless defined $name;
-  _looks_ok( $arr->[0]->{raw_line}, $line, $name )
+  _looks_ok( $arr->[0]->{raw_line}, $line, $name ) ? 
+    $line : ()
 }
 
 sub get_tags_ok {
@@ -259,7 +265,8 @@ sub get_tags_ok {
     unless ref $arr->[0] eq 'HASH';
 
   $name = 'tags look ok' unless defined $name;
-  _looks_ok( $arr->[0]->{tags}, $tags, $name )
+  _looks_ok( $arr->[0]->{tags}, $tags, $name ) ?
+    $arr->[0]->{tags} : ()
 }
 
 
