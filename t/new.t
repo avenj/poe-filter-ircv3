@@ -5,7 +5,14 @@ use TestFilterHelpers;
 
 BEGIN { use_ok('POE::Filter::IRCv3') }
 
-my $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
+our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
+
+# clone
+{ my $clone = $filter->clone;
+  isa_ok $clone, ref $filter;
+  ok $clone->colonify, 
+    'cloned obj preserved colonify => 1';
+}
 
 # get_one_start/get_one
 { my $line = ':test foo';
@@ -259,11 +266,64 @@ my $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
     my $second = $filter->get([ @$raw ]);
     delete $ev->[0]->{raw_line}; delete $second->[0]->{raw_line};
     is_deeply $second, $ev, 'round-tripped tags with prefix';
-
 }
+
 # Params containing arbitrary bytes
+{ use bytes;
+  my $line = ":foo PRIVMSG #f\x{df}\x{de}oo\707\0";
+
+  get_prefix_ok $filter, $line => 'foo',
+    'arbitrary bytes prefix ok';
+
+  get_command_ok $filter, $line => 'PRIVMSG',
+    'arbitrary bytes command ok';
+
+  my $ev = $filter->get([ $line ])->[0];
+
+  ok @{$ev->{params}} == 1, 
+    'arbitrary bytes param count ok';
+
+  ok $ev->{params}->[0] eq "#f\x{df}\x{de}oo\707\0",
+    'arbitrary bytes params ok';
+
+  $ev->{colonify} = 0;
+  ok $filter->put([ $ev ])->[0] eq $line, 
+    'bytes round-tripped ok';
+}
 
 # 'colonify =>' behavior
+{ local $filter = POE::Filter::IRCv3->new(colonify => 1);
+  my $str = ':test FOO :bar';
+  my $ev  = $filter->get([ $str ]);
+  my $par = $filter->put([ @$ev ]);
+  cmp_ok $par->[0], 'eq', $str,
+    'colonify => 1 round-trip ok';
+
+  $ev->[0]->{colonify} = 0;
+  my $wpar = $filter->put([ @$ev ]);
+  cmp_ok $wpar->[0], 'eq', ':test FOO bar',
+    'per-event colonify => 0 ok';
+}
+{ local $filter = POE::Filter::IRCv3->new(colonify => 0);
+  my $str = 'FOO bar';
+  my $ev  = $filter->get([ $str ]);
+  my $par = $filter->put([ @$ev ]);
+  cmp_ok $par->[0], 'eq', $str,
+    'colonify => 0 round-trip ok';
+
+  $ev->[0]->{colonify} = 1;
+  my $wpar = $filter->put([ @$ev ]);
+  cmp_ok $wpar->[0], 'eq', 'FOO :bar',
+    'per-event colonify => 1 ok';
+
+  put_ok $filter, "FOO foo :A string" =>
+    +{
+        colonify => 0,
+        command => 'FOO',
+        params  => [ 'foo', 'A string' ],
+    },
+    'colonified string with spaces';
+}
 
 # Bad lines warn
 
