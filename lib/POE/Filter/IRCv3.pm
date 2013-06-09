@@ -159,10 +159,10 @@ sub _parseline {
   ## We just stick to SPCHR (\x20) here.
 
   if ( substr($raw_line, 0, 1) eq '@' ) {
-    my $nextsp = index $raw_line, SPCHR, $pos;
+    my $nextsp = index $raw_line, SPCHR;
     return unless $nextsp > 0;
     for my $tag_pair 
-      ( split /;/, substr $raw_line, ($pos + 1), ($nextsp - 1) ) {
+      ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
           my ($thistag, $thisval) = split /=/, $tag_pair;
           $event{tags}->{$thistag} = $thisval
     }
