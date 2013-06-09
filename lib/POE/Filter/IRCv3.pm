@@ -171,8 +171,9 @@ sub _parseline {
 
   if ( substr($raw_line, $pos, 1) eq ':' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
-    return unless $nextsp > 0;
-    $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1);
+    $nextsp > 0 and length( 
+      $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1)
+    ) or return;
     $pos = $nextsp + 1;
     $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
   }
