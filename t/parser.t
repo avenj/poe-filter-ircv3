@@ -16,6 +16,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
 # get_one_start/get_one
 { my $line = ':test foo';
+
     $filter->get_one_start([ ':test foo' ]);
     my $ev = $filter->get_one;
     is_deeply( $ev,
@@ -32,6 +33,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
 # Simple prefix + command
 { my $line = ':test foo';
+
     get_ok $filter, $line =>
       +{
           raw_line => $line,
@@ -47,6 +49,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
 # Simple prefix + command with trailing spaces
 { my $line = ':test foo   ';
+
     my $ev = get_ok $filter, $line =>
       +{
           raw_line => $line,

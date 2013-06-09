@@ -189,6 +189,27 @@ sub _parseline {
 
   $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
+
+## This is one way to do it without consuming the rest of the string,
+## but the string-consuming method below wins on performance.
+##
+#  PARAM: while ( length substr($raw_line, $pos, 1) ) {
+#    ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
+#    if (substr($raw_line, $pos, 1) eq ':') {
+#      push @{ $event{params} }, substr $raw_line, ($pos + 1);
+#      last PARAM
+#    }
+#    my $space = index $raw_line, SPCHR, $pos;
+#    if ($space == -1) {
+#      push @{ $event{params} }, substr $raw_line, $pos;
+#      last PARAM
+#    } else {
+#      push @{ $event{params} }, substr $raw_line, $pos, ($space - $pos);
+#      $pos = $space + 1;
+#      next PARAM
+#    }
+#  }
+
   my $remains = substr $raw_line, $pos;
   PARAM: while (defined $remains and length $remains) {
     if ( index($remains, ':') == 0 ) {
