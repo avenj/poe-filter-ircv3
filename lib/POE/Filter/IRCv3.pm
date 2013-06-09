@@ -153,6 +153,11 @@ sub _parseline {
   my $pos = 0;
   no warnings 'substr';
 
+  ## We cheat a little; the spec is fuzzy when it comes to CR, LF, and NUL
+  ## bytes. Theoretically they're not allowed inside messages, but
+  ## that's really an implementation detail (and the spec agrees).
+  ## We just stick to SPCHR (\x20) here.
+
   if ( substr($raw_line, 0, 1) eq '@' ) {
     my $nextsp = index $raw_line, SPCHR, $pos;
     return unless $nextsp > 0;
@@ -189,9 +194,24 @@ sub _parseline {
 
   $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
+  my $remains = substr $raw_line, $pos;
+  PARAM: while (defined $remains and length $remains) {
+    if ( index($remains, ':') == 0 ) {
+      push @{ $event{params} }, substr $remains, 1;
+      last PARAM
+    }
+    if ( (my $space = index $remains, SPCHR) == -1) {
+      push @{ $event{params} }, $remains;
+      last PARAM
+    } else {
+      push @{ $event{params} }, substr $remains, 0, $space;
+      $remains = substr $remains, ($space + 1);
+      $remains = substr($remains, 1) while substr($remains, 0, 1) eq SPCHR;
+    }
+  }
 
 ## This is one way to do it without consuming the rest of the string,
-## but the string-consuming method below wins on performance.
+## but the string-consuming method above wins on performance.
 ##
 #  PARAM: while ( length substr($raw_line, $pos, 1) ) {
 #    ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
@@ -209,22 +229,6 @@ sub _parseline {
 #      next PARAM
 #    }
 #  }
-
-  my $remains = substr $raw_line, $pos;
-  PARAM: while (defined $remains and length $remains) {
-    if ( index($remains, ':') == 0 ) {
-      push @{ $event{params} }, substr $remains, 1;
-      last PARAM
-    }
-    if ( (my $space = index $remains, SPCHR) == -1) {
-      push @{ $event{params} }, $remains;
-      last PARAM
-    } else {
-      push @{ $event{params} }, substr $remains, 0, $space;
-      $remains = substr $remains, ($space + 1);
-      $remains = substr($remains, 1) while substr($remains, 0, 1) eq SPCHR;
-    }
-  }
 
   \%event
 }
