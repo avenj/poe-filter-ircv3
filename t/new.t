@@ -326,5 +326,25 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 }
 
 # Bad lines warn
+{ my $line = ':foo';
+  
+  my $warned;
+  local $SIG{__WARN__} = sub { ++$warned };
+
+  ok !@{$filter->get([ $line ])}, 
+    'line with prefix only returned';
+  ok $warned, 
+    'line with prefix only warned';
+}
+{ my $line = '@foo :foo';
+
+  my $warned;
+  local $SIG{__WARN__} = sub { ++$warned };
+
+  ok !@{$filter->get([ $line ])}, 
+    'line with tags and prefix only returned';
+  ok $warned, 
+    'line with tags and prefix only warned';
+}
 
 done_testing;
