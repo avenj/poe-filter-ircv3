@@ -1,50 +1,56 @@
 use strictures 1;
 use Benchmark ':all';
 
+
 require POE::Filter::IRCD;
 require POE::Filter::IRCv3;
-my $old = POE::Filter::IRCD->new;
-my $new = POE::Filter::IRCv3->new;
 
-my $basic = ':test!me@test.ing PRIVMSG #Test :This is a test'
-            .' but not of the emergency broadcast system'
-            .' foo bar baz quux snarf';
+my ($old, $new);
+print " -> object construction <- \n";
+cmpthese( 500_000, +{
+  ircv3  => sub { $new = POE::Filter::IRCv3->new },
+  ircd   => sub { $old = POE::Filter::IRCD->new  }
+});
 
-my $multiparam = ':test!me@test.ing foo bar baz quux frobulate snack';
+{
+  my $basic = ':test!me@test.ing PRIVMSG #Test :This is a test'
+              .' but not of the emergency broadcast system'
+              .' foo bar baz quux snarf';
 
-my ($ev_old_one, $ev_old_two, $ev_old_three);
-my ($ev_new_one, $ev_new_two, $ev_new_three);
-my $get_tests = +{
-  old_get => sub {
-    $ev_old_one   = $old->get([ $basic ]);
-    $ev_old_two   = $old->get([ 'foo bar' ]);
-    $ev_old_three = $old->get([ $multiparam ]);
-  },
+  print " -> common string get() <- \n";
 
-  new_get => sub {
-    $ev_new_one   = $new->get([ $basic ]);
-    $ev_new_two   = $new->get([ 'foo bar' ]);
-    $ev_new_three = $new->get([ $multiparam ]);
-  },
-};
+  my ($ev_new, $ev_old);
+  cmpthese( 500_000, +{
+    ircv3  => sub { $ev_new = $new->get([ $basic ]) },
+    ircd   => sub { $ev_old = $old->get([ $basic ]) }
+  });
 
-cmpthese( 200_000, $get_tests );
-timethese( 200_000, $get_tests );
 
-my $put_tests = +{
-  old_put => sub {
-    my $foo = $old->put([ @$ev_old_one ]);
-    my $bar = $old->put([ @$ev_old_two ]);
-    my $baz = $old->put([ @$ev_old_three ]);
-  },
+  print " -> common string put() <- \n";
 
-  new_put => sub {
-    $new->put([ @$ev_new_one ]);
-    $new->put([ @$ev_new_two ]);
-    $new->put([ @$ev_new_three ]);
-  },
-};
+  cmpthese( 500_000, +{
+    ircv3 => sub { my $lines = $new->put([ @$ev_new ]) },
+    ircd  => sub { my $lines = $old->put([ @$ev_old ]) }
+  });
+}
 
-cmpthese( 200_000, $put_tests );
-timethese( 200_000, $put_tests );
+{
+  my $multiparam = ':test!me@test.ing foo bar baz quux frobulate snack';
+
+  print " -> multi-param string get() <- \n";
+
+  my ($ev_new, $ev_old);
+  cmpthese( 500_000, +{
+    ircv3  => sub { $ev_new = $new->get([ $multiparam ]) },
+    ircd   => sub { $ev_old = $old->get([ $multiparam ]) }
+  });
+
+
+  print " -> multi-param string put() <- \n";
+
+  cmpthese( 500_000, +{
+    ircv3 => sub { my $lines = $new->put([ @$ev_new ]) },
+    ircd  => sub { my $lines = $old->put([ @$ev_old ]) }
+  });
+}
 
