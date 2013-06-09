@@ -218,6 +218,56 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
       'extraneous space in commands without trailing put() ok';
 }
 
+# Empty tags, no prefix
+{ my $line = '@ foo bar';
+
+    get_ok $filter, $line =>  
+      +{
+          raw_line => $line,
+          command  => 'FOO',
+          params   => [ 'bar' ],
+      },
+      'empty tags without prefix get() ok';
+}
+
+# Empty tags, prefix
+{ my $line = '@ :foo bar baz quux';
+
+    get_ok $filter, $line =>
+      +{
+          raw_line => $line,
+          command  => 'BAR',
+          params   => [ 'baz', 'quux' ],
+          prefix   => 'foo',
+      },
+      'empty tags with prefix get() ok';
+}
+
+# Empty tags, no prefix, extraneous space
+{ my $line = '@   foo bar';
+
+    get_ok $filter, $line =>
+      +{
+          raw_line => $line,
+          command  => 'FOO',
+          params   => [ 'bar' ],
+      },
+      'empty tags with extraneous space and no prefix get() ok';
+}
+
+# Empty tags, prefix, extraneous space
+{ my $line = '@   :foo bar baz';
+
+    get_ok $filter, $line =>
+      +{
+          raw_line => $line,
+          command  => 'BAR',
+          params   => [ 'baz' ],
+          prefix   => 'foo',
+      },
+      'empty tags with extraneous space and prefix get() ok';
+}
+
 # Tags, no prefix
 { my $line = '@foo=bar;znc.in/ext=val;baz'
             .' PRIVMSG #chan :A string';
