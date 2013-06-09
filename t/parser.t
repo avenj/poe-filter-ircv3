@@ -9,7 +9,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
 # clone
 { my $clone = $filter->clone;
-  isa_ok $clone, ref $filter;
+  isa_ok $clone, ref $filter, 'cloned obj';
   ok $clone->colonify, 
     'cloned obj preserved colonify => 1';
 }
@@ -183,6 +183,23 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
   
     put_ok $filter, ":test PRIVMSG foo :bar" => $ev,
       'extraneous space in command/params put() ok';
+}
+
+# Extraneous spaces, no trailing
+{ my $line = 'FOO  bar   baz   quux';
+
+    my $ev = get_ok $filter, $line =>
+      +{
+          raw_line => $line,
+          command  => 'FOO',
+          params   => [
+            'bar', 'baz', 'quux'
+          ],
+      },
+      'extraneous space in commands without trailing get() ok';
+
+    put_ok $filter, "FOO bar baz :quux" => $ev,
+      'extraneous space in commands without trailing put() ok';
 }
 
 # Tags, no prefix
