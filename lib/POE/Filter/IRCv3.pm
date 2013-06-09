@@ -18,15 +18,13 @@ sub SPCHR    () { "\x20" }
 
 sub new {
   my ($class, %params) = @_;
-  $params{uc $_} = delete $params{$_} for keys %params;
+  $params{uc $_} = $params{$_} for keys %params;
 
-  my $self = [
+  bless [
     ($params{'COLONIFY'} || 0),
     ($params{'DEBUG'}    || 0),
     []  ## BUFFER
-  ];
-
-  bless $self, $class;
+  ], $class
 }
 
 sub clone {
