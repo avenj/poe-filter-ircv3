@@ -29,8 +29,8 @@ timethese( 200_000, $get_tests );
 
 my $put_tests = +{
   old_put => sub {
-    my $foo = $new->put([ @$ev_old_one ]);
-    my $bar = $new->put([ @$ev_old_two ]);
+    my $foo = $old->put([ @$ev_old_one ]);
+    my $bar = $old->put([ @$ev_old_two ]);
   },
 
   new_put => sub {
