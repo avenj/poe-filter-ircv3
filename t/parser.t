@@ -357,7 +357,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
 # Params containing arbitrary bytes
 { use bytes;
-  my $line = ":foo PRIVMSG #f\x{df}\x{de}oo\707\0";
+  my $line = ":foo PRIVMSG #f\303\202\203\240oo\707\0";
 
   get_prefix_ok $filter, $line => 'foo',
     'arbitrary bytes prefix ok';
@@ -370,7 +370,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
   ok @{$ev->{params}} == 1, 
     'arbitrary bytes param count ok';
 
-  ok $ev->{params}->[0] eq "#f\x{df}\x{de}oo\707\0",
+  ok $ev->{params}->[0] eq "#f\303\202\203\240oo\707\0",
     'arbitrary bytes params ok';
 
   $ev->{colonify} = 0;
