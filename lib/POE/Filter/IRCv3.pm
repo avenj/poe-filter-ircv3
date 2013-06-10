@@ -22,7 +22,7 @@ sub new {
 
   bless [
     ($params{'COLONIFY'} || 0),
-    ($params{'DEBUG'}    || 0),
+    ($params{'DEBUG'}    || $ENV{POE_FILTER_IRC_DEBUG} || 0),
     []  ## BUFFER
   ], $class
 }
@@ -62,7 +62,7 @@ sub get {
   my @events;
 
   for my $raw_line (@$raw_lines) {
-    warn "-> $raw_line \n" if $self->[DEBUG];
+    warn " >> '$raw_line'\n" if $self->[DEBUG];
     if (my $event = _parseline($raw_line)) {
       push @events, $event;
     } else {
@@ -78,7 +78,7 @@ sub get_one {
   my @events;
 
   if (my $raw_line = shift @{ $self->[BUFFER] }) {
-    warn "-> $raw_line \n" if $self->[DEBUG];
+    warn " >> '$raw_line'\n" if $self->[DEBUG];
     if (my $event = _parseline($raw_line)) {
       push @events, $event;
     } else {
@@ -133,7 +133,7 @@ sub put {
       }
 
       push @$raw_lines, $raw_line;
-      warn "<- $raw_line \n" if $self->[DEBUG];
+      warn " << '$raw_line'\n" if $self->[DEBUG];
     } else {
       carp "($self) non-HASH passed to put(): '$event'";
       push @$raw_lines, $event if ref $event eq 'SCALAR';
@@ -377,7 +377,11 @@ Copy the filter object (with a cleared buffer).
 
 =head2 debug
 
-Turn on/off debug output.
+Turn on/off debug output, which will display every input/output line (and
+possibly other data in the future).
+
+This is enabled by default at construction time if the environment variable
+C<POE_FILTER_IRC_DEBUG> is a true value.
 
 =head1 AUTHOR
 
