@@ -18,8 +18,7 @@ sub SPCHR    () { "\x20" }
 
 sub new {
   my ($class, %params) = @_;
-  $params{uc $_} = $params{$_} for keys %params;
-
+  map {; $params{uc $_} = $params{$_} } keys %params;
   bless [
     ($params{'COLONIFY'} || 0),
     ($params{'DEBUG'}    || $ENV{POE_FILTER_IRC_DEBUG} || 0),
@@ -193,40 +192,42 @@ sub _parseline {
 
   $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
-  my $remains = substr $raw_line, $pos;
-  PARAM: while (defined $remains && length $remains) {
-    if ( index($remains, ':') == 0 ) {
-      push @{ $event{params} }, substr $remains, 1;
+  my $maxlen = length $raw_line;
+  PARAM: while ( $pos < $maxlen ) {
+    ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
+    if (substr($raw_line, $pos, 1) eq ':') {
+      push @{ $event{params} }, substr $raw_line, ($pos + 1);
       last PARAM
     }
-    if ( (my $space = index $remains, SPCHR) == -1) {
-      push @{ $event{params} }, $remains;
+    my $space = index $raw_line, SPCHR, $pos;
+    if ($space == -1) {
+      push @{ $event{params} }, substr $raw_line, $pos;
       last PARAM
     } else {
-      push @{ $event{params} }, substr $remains, 0, $space;
-      $remains = substr $remains, ($space + 1);
-      $remains = substr($remains, 1) while substr($remains, 0, 1) eq SPCHR;
+      push @{ $event{params} }, substr $raw_line, $pos, ($space - $pos);
+      $pos = $space + 1;
+      next PARAM
     }
   }
 
-## This is one way to do it without consuming the rest of the string,
-## but the string-consuming method above wins on performance on
-## most common IRC strings (which typically have few params)
-##
-#  PARAM: while ( $pos < length $raw_line ) {
-#    ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
-#    if (substr($raw_line, $pos, 1) eq ':') {
-#      push @{ $event{params} }, substr $raw_line, ($pos + 1);
+## The string-consuming approach below benches slightly faster on the most
+## common types of IRC strings (few middle params, one long trailing param).
+## It also benches noticably slower on lots of middle params.
+## Tradeoffs and dilemmas . . .
+#
+#  my $remains = substr $raw_line, $pos;
+#  PARAM: while (defined $remains && length $remains) {
+#    if ( index($remains, ':') == 0 ) {
+#      push @{ $event{params} }, substr $remains, 1;
 #      last PARAM
 #    }
-#    my $space = index $raw_line, SPCHR, $pos;
-#    if ($space == -1) {
-#      push @{ $event{params} }, substr $raw_line, $pos;
+#    if ( (my $space = index $remains, SPCHR) == -1) {
+#      push @{ $event{params} }, $remains;
 #      last PARAM
 #    } else {
-#      push @{ $event{params} }, substr $raw_line, $pos, ($space - $pos);
-#      $pos = $space + 1;
-#      next PARAM
+#      push @{ $event{params} }, substr $remains, 0, $space;
+#      $remains = substr $remains, ($space + 1);
+#      $remains = substr($remains, 1) while substr($remains, 0, 1) eq SPCHR;
 #    }
 #  }
 
