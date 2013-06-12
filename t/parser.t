@@ -417,7 +417,6 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
   
   my $warned;
   local $SIG{__WARN__} = sub { ++$warned };
-
   ok !@{$filter->get([ $line ])}, 
     'line with prefix only returned';
   ok $warned, 
@@ -427,7 +426,6 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
   my $warned;
   local $SIG{__WARN__} = sub { ++$warned };
-
   ok !@{$filter->get([ $line ])}, 
     'line with tags and prefix only returned';
   ok $warned, 

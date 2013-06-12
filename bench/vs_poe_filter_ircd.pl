@@ -2,8 +2,8 @@ use strictures 1;
 use Benchmark ':all';
 
 
-require POE::Filter::IRCD;
-require POE::Filter::IRCv3;
+use POE::Filter::IRCD 2.44;
+use POE::Filter::IRCv3;
 
 my ($old, $new);
 print " -> object construction <- \n";
@@ -51,6 +51,25 @@ cmpthese( 500_000, +{
   cmpthese( 500_000, +{
     ircv3 => sub { my $lines = $new->put([ @$ev_new ]) },
     ircd  => sub { my $lines = $old->put([ @$ev_old ]) }
+  });
+}
+
+{
+  my $tagged = '@foo=bar;baz :foo bar baz';
+
+  print " -> tagged + prefix get() <- \n";
+
+  my ($ev_new, $ev_old);
+  cmpthese( 500_000, +{
+    ircv3 => sub { $ev_new = $new->get([ $tagged ]) },
+    ircd  => sub { $ev_old = $old->get([ $tagged ]) }
+  });
+
+  print " -> tagged + prefix put() <- \n";
+
+  cmpthese( 500_00, +{
+    ircv3 => sub { my $lines = $new->put([ @$ev_new ]) },
+    ircd  => sub { my $lines = $old->put([ @$ev_old ]) },
   });
 }
 
