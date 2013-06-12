@@ -134,7 +134,11 @@ Copy the filter object (with a cleared buffer).
 
 ## debug
 
-Turn on/off debug output.
+Turn on/off debug output, which will display every input/output line (and
+possibly other data in the future).
+
+This is enabled by default at construction time if the environment variable
+`POE_FILTER_IRC_DEBUG` is a true value.
 
 # AUTHOR
 

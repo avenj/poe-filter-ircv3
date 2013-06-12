@@ -1,5 +1,14 @@
 # Changes for POE::Filter::IRCv3
 
+0.045000   (12 Jun 2013)
+  (0.45.0)
+
+  Swap params parser implementations; slightly faster on strings containing
+  many middle parameters.
+
+  Turn on ->debug(1) at construction time if env POE_FILTER_IRC_DEBUG is true.
+
+
 0.044000   (09 Jun 2013)
   (0.44.0)
 
