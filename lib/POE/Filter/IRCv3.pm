@@ -194,7 +194,6 @@ sub _parseline {
 
   my $maxlen = length $raw_line;
   PARAM: while ( $pos < $maxlen ) {
-    ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
     if (substr($raw_line, $pos, 1) eq ':') {
       push @{ $event{params} }, substr $raw_line, ($pos + 1);
       last PARAM
@@ -206,6 +205,7 @@ sub _parseline {
     } else {
       push @{ $event{params} }, substr $raw_line, $pos, ($space - $pos);
       $pos = $space + 1;
+      ++$pos while substr($raw_line, $pos, 1) eq SPCHR;
       next PARAM
     }
   }
