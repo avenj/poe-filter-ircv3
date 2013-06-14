@@ -154,8 +154,7 @@ sub _parseline {
   ## We just stick to SPCHR (\x20) here.
 
   if ( substr($raw_line, 0, 1) eq '@' ) {
-    my $nextsp = index $raw_line, SPCHR;
-    return unless $nextsp > 0;
+    return unless (my $nextsp = index($raw_line, SPCHR)) > 0;
     # Tag parser cheats; split takes a pattern:
     for my $tag_pair 
       ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
@@ -168,16 +167,19 @@ sub _parseline {
   $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   if ( substr($raw_line, $pos, 1) eq ':' ) {
-    my $nextsp = index $raw_line, SPCHR, $pos;
-    $nextsp > 0 and length( 
-      $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1)
-    ) or return;
+    # Have prefix.
+    my $nextsp;
+    ($nextsp = index $raw_line, SPCHR, $pos) > 0
+      and length( 
+        $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1)
+      ) 
+      or return;
     $pos = $nextsp + 1;
     $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
   }
 
-  my $nextsp_maybe = index $raw_line, SPCHR, $pos;
-  if ($nextsp_maybe == -1) {
+  my $nextsp_maybe;
+  if (($nextsp_maybe = index $raw_line, SPCHR, $pos) == -1) {
     # No more spaces; do we have anything..?
     my $cmd = substr $raw_line, $pos;
     $event{command} = uc( length $cmd ? $cmd : return );
@@ -197,8 +199,7 @@ sub _parseline {
       push @{ $event{params} }, substr $raw_line, ($pos + 1);
       last PARAM
     }
-    my $nextsp = index $raw_line, SPCHR, $pos;
-    if ($nextsp == -1) {
+    if ((my $nextsp = index $raw_line, SPCHR, $pos) == -1) {
       push @{ $event{params} }, substr $raw_line, $pos;
       last PARAM
     } else {
