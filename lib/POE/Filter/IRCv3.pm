@@ -197,13 +197,13 @@ sub _parseline {
       push @{ $event{params} }, substr $raw_line, ($pos + 1);
       last PARAM
     }
-    my $space = index $raw_line, SPCHR, $pos;
-    if ($space == -1) {
+    my $nextsp = index $raw_line, SPCHR, $pos;
+    if ($nextsp == -1) {
       push @{ $event{params} }, substr $raw_line, $pos;
       last PARAM
     } else {
-      push @{ $event{params} }, substr $raw_line, $pos, ($space - $pos);
-      $pos = $space + 1;
+      push @{ $event{params} }, substr $raw_line, $pos, ($nextsp - $pos);
+      $pos = $nextsp + 1;
       $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
       next PARAM
     }
