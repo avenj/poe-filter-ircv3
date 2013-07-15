@@ -167,13 +167,10 @@ sub _parseline {
   $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
 
   if ( substr($raw_line, $pos, 1) eq ':' ) {
-    # Have prefix.
     my $nextsp;
-    ($nextsp = index $raw_line, SPCHR, $pos) > 0
-      and length( 
+    ($nextsp = index $raw_line, SPCHR, $pos) > 0 and length(
         $event{prefix} = substr $raw_line, ($pos + 1), ($nextsp - $pos - 1)
-      ) 
-      or return;
+    ) or return;
     $pos = $nextsp + 1;
     $pos++ while substr($raw_line, $pos, 1) eq SPCHR;
   }
@@ -217,7 +214,10 @@ sub _parseline {
 no bytes;
 
 
-1;
+print
+  qq[<mst> let's try this again -without- the part where we beat you to],
+  qq[ death with a six foot plush toy of sexual harassment panda\n ]
+unless caller; 1;
 
 
 =pod
