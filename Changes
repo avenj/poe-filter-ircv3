@@ -1,89 +1,72 @@
-# Changes for POE::Filter::IRCv3
+Revision history for Perl module POE::Filter::IRCv3
 
-0.045001   (15 Jul 2013)
-  (0.45.1)
+0.045001 2013-06-15
 
-  Minor optimizations.
+  - Minor optimizations.
 
+0.045000 2013-06-12
 
-0.045000   (12 Jun 2013)
-  (0.45.0)
+  - Swap params parser implementations; slightly faster on strings containing
+    many middle parameters.
 
-  Swap params parser implementations; slightly faster on strings containing
-  many middle parameters.
+  - Turn on ->debug(1) at construction time if env POE_FILTER_IRC_DEBUG is 
+    true.
 
-  Turn on ->debug(1) at construction time if env POE_FILTER_IRC_DEBUG is true.
+0.044000 2013-06-09
 
+  - Fix a bug in detecting invalid zero-length prefix; tests for same.
 
-0.044000   (09 Jun 2013)
-  (0.44.0)
+0.043000 2013-06-09
 
-  Fix a bug in detecting invalid zero-length prefix; tests for same.
+  - Fix a bug in detecting extraneous spaces between middle and trailing 
+    params.
 
+  - New test suite and improved helpers for same.
 
-0.043000   (09 Jun 2013)
-  (0.43.0)
+0.042003 2013-06-08
 
-  Fix a bug in detecting extraneous spaces between middle and trailing 
-  params.
+  - POD fixes; leftovers from ancient import (how did that get there?)
 
-  New test suite and improved helpers for same.
+0.042002 2013-06-08
 
+  - Fix trailing spaces in commands; previously returned an empty
+    string parameter in ->{params}
 
-0.042003   (08 Jun 2013)
-  (0.42.3)
+0.042001 2013-06-07
 
-  POD fixes; leftovers from ancient import (how did that get there?)
+  - Fix per-event 'colonify =>' configurable; tests for same
 
+0.042000 2013-06-07
 
-0.042002   (08 Jun 2013)
-  (0.42.2)
+  - Improved non-regex parser and tests for same.
 
-  Fix trailing spaces in commands; previously returned an empty
-  string parameter in ->{params}
+0.041001 2013-06-05
 
+  - Revert to previous parser until we have better tests
 
-0.042001   (07 Jun 2013)
-  (0.42.1)
+0.041000 2013-06-05
 
-  Fix per-event 'colonify =>' configurable; tests for same
+  - Switch to a non-regex get_one() implementation.
+    Benching shows this is faster in many cases.
 
+0.040001 2013-02-04
 
-0.042000   (07 Jun 2013)
-  (0.42.0)
+  - Empty-string prefix should DWIM
 
-  Improved non-regex parser and tests for same.
-  
+  - Switch to long-format semantic version
 
-0.041001   (05 Jun 2013)
-  (0.41.1)
+0.04 2013-02-04
 
-  Revert to previous parser until we have better tests.
-  (That release was admittedly hasty.)
+  - Missing dep on parent . . . again.
 
+0.03 2013-02-1
 
-0.041000   (05 Jun 2013)
-  (0.41.0)
+  - Fix a broken test (5.17 exposed hash order mistake)
 
-  Switch to a non-regex get_one() implementation.
-  (Benching shows this is slightly faster in many cases.)
+0.02 2013-01-31
 
+  - Missing dependency on 'parent'
 
-0.040001   (04 Feb 2013)
-  (0.40.1)
+0.01 2013-01-27
 
-  Empty-string prefix should DWIM
-  Switch to long-format semantic version
-
-
-0.04    (04 Feb 2013)
-  Whoops. Missing dep on parent . . . again.
-
-0.03    (01 Feb 2013)
-  Fix a broken test (5.17 exposed hash order mistake)
-
-0.02    (31 Jan 2013)
-  Missing dependency on 'parent'
-
-0.01    (27 Jan 2013)
-  Initial release
+  - Initial release
