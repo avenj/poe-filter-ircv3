@@ -1,5 +1,9 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+0.045002 2013-08-10
+
+  - No code changes; fix 'Changes' to match CPAN::Changes::Spec
+
 0.045001 2013-06-15
 
   - Minor optimizations.
