@@ -125,7 +125,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
       'middle params containing tabs put() ok' ;
 }
 
-# Middle params containing colons
+# Middle params containing colons w/ prefix
 { my $line = ':test PRIVMSG #fo:oo :This is a test';
   warn "# >> '", $line, "'\n" if $show;
   
@@ -138,10 +138,30 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
           ],
           prefix   => 'test',
       },
-      'middle params containing colons get() ok' ;
+      'middle params containing colons with prefix get() ok' ;
 
     put_ok $filter, $line => $ev,
-      'middle params containing colons put() ok' ;
+      'middle params containing colons with prefix put() ok' ;
+}
+
+
+# Middle params containing colons without prefix
+{ my $line = 'PRIVMSG #fo:oo :This is a test';
+  warn "# >> '", $line, "'\n" if $show;
+
+    my $ev = get_ok $filter, $line =>
+      +{
+          raw_line => $line,
+          command  => 'PRIVMSG',
+          params   => [
+            '#fo:oo', 'This is a test'
+          ],
+      },
+      'middle params containing colons without prefix get() ok';
+
+      put_ok $filter, $line => $ev,
+        'middle params containing colons without prefix put() ok';
+
 }
 
 # No prefix, command, one middle param, trailing params
