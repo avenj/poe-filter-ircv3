@@ -57,25 +57,21 @@ sub get_pending {
 }
 
 sub get {
-  my ($self, $raw_lines) = @_;
   my @events;
-
-  for my $raw_line (@$raw_lines) {
-    warn " >> '$raw_line'\n" if $self->[DEBUG];
+  for my $raw_line (@{ $_[1] }) {
+    warn " >> '$raw_line'\n" if $_[0]->[DEBUG];
     if (my $event = _parseline($raw_line)) {
       push @events, $event;
     } else {
       carp "Received malformed IRC input: $raw_line";
     }
   }
-
   \@events
 }
 
 sub get_one {
   my ($self) = @_;
   my @events;
-
   if (my $raw_line = shift @{ $self->[BUFFER] }) {
     warn " >> '$raw_line'\n" if $self->[DEBUG];
     if (my $event = _parseline($raw_line)) {
@@ -84,7 +80,6 @@ sub get_one {
       warn "Received malformed IRC input: $raw_line\n";
     }
   }
-
   \@events
 }
 

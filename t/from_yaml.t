@@ -1,5 +1,7 @@
 use strict; use warnings FATAL => 'all';
 
+# This should be genericized out to a standalone IRC parser testsuite ...
+
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
     require Test::More;
