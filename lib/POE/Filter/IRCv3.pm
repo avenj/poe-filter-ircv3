@@ -3,7 +3,11 @@ package POE::Filter::IRCv3;
 use strictures 1;
 use Carp;
 
-use parent 'POE::Filter';
+BEGIN {
+  if (eval { require POE::Filter; 1 }) {
+    our @ISA = 'POE::Filter';
+  }
+}
 
 =pod
 
