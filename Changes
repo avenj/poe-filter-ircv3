@@ -1,5 +1,9 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+0.045003 2013-10-26
+
+  - POE dependency is now optional
+
 0.045002 2013-08-10
 
   - No code changes; fix 'Changes' to match CPAN::Changes::Spec
