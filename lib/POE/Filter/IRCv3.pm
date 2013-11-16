@@ -1,6 +1,5 @@
 package POE::Filter::IRCv3;
-
-use strictures 1;
+use strict; use warnings FATAL => 'all';
 use Carp;
 
 BEGIN {
@@ -283,7 +282,11 @@ counterparts; benchmarks show this approach is slightly faster on most strings.
 
 Like any proper L<POE::Filter>, there are no POE-specific bits involved here
 -- the filter can be used stand-alone to parse lines of IRC traffic (also see
-L<IRC::Toolkit::Parser>).
+L<IRC::Toolkit::Parser>). 
+
+In fact, you do not need L<POE> installed -- if L<POE::Filter> is not
+available, it is left out of C<@ISA> and the filter will continue working
+normally.
 
 =head2 new
 
