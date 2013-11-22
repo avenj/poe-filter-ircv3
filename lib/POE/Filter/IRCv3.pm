@@ -380,6 +380,8 @@ C<grawity>, for various bits of inspiration.
 
 =head1 SEE ALSO
 
+L<IRC::Message::Object>
+
 L<POE::Filter>
 
 L<POE::Filter::IRCD>
