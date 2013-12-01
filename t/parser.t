@@ -32,6 +32,14 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
       ],
       'get_one_start/get_one ok'
     );
+
+    $filter->get_one_start([ $line ]);
+    my $pending = $filter->get_pending;
+    ok ref $pending eq 'ARRAY', 'get_pending ok';
+    ok @$pending == 1,          'get pending returned one item';
+    ok $pending->[0] eq $line,  'get pending item ok';
+    # clear buf:
+    $filter->get_one;
 }
 
 # Simple prefix + command
@@ -410,6 +418,8 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
   my $wpar = $filter->put([ @$ev ]);
   cmp_ok $wpar->[0], 'eq', ':test FOO bar',
     'per-event colonify => 0 ok';
+
+  ok $filter->colonify(0) == 0, 'colonify attrib change ok';
 }
 { local $filter = POE::Filter::IRCv3->new(colonify => 0);
   my $str = 'FOO bar';
