@@ -1,4 +1,5 @@
-META.*
-Makefile.PL
-MANIFEST
-MANIFEST.SKIP
+.proverc
+.gitignore
+cover_db
+covered
+runcoverage
