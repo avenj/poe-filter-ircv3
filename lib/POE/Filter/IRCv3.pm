@@ -63,7 +63,7 @@ sub get {
   my @events;
   for my $raw_line (@{ $_[1] }) {
     warn " >> '$raw_line'\n" if $_[0]->[DEBUG];
-    if (my $event = _parseline($raw_line)) {
+    if ( my $event = _parseline($raw_line) ) {
       push @events, $event;
     } else {
       carp "Received malformed IRC input: $raw_line";
@@ -75,9 +75,9 @@ sub get {
 sub get_one {
   my ($self) = @_;
   my @events;
-  if (my $raw_line = shift @{ $self->[BUFFER] }) {
+  if ( my $raw_line = shift @{ $self->[BUFFER] } ) {
     warn " >> '$raw_line'\n" if $self->[DEBUG];
-    if (my $event = _parseline($raw_line)) {
+    if ( my $event = _parseline($raw_line) ) {
       push @events, $event;
     } else {
       warn "Received malformed IRC input: $raw_line\n";
@@ -174,7 +174,7 @@ sub _parseline {
   }
 
   my $nextsp_maybe;
-  if (($nextsp_maybe = index $raw_line, SPCHR, $pos) == -1) {
+  if ( ($nextsp_maybe = index $raw_line, SPCHR, $pos) == -1 ) {
     # No more spaces; do we have anything..?
     my $cmd = substr $raw_line, $pos;
     $event{command} = uc( length $cmd ? $cmd : return );
@@ -190,11 +190,11 @@ sub _parseline {
 
   my $maxlen = length $raw_line;
   PARAM: while ( $pos < $maxlen ) {
-    if (substr($raw_line, $pos, 1) eq ':') {
+    if ( substr($raw_line, $pos, 1) eq ':' ) {
       push @{ $event{params} }, substr $raw_line, ($pos + 1);
       last PARAM
     }
-    if ((my $nextsp = index $raw_line, SPCHR, $pos) == -1) {
+    if ( (my $nextsp = index $raw_line, SPCHR, $pos) == -1 ) {
       push @{ $event{params} }, substr $raw_line, $pos;
       last PARAM
     } else {
