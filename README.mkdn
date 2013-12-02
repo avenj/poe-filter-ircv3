@@ -61,7 +61,11 @@ counterparts; benchmarks show this approach is slightly faster on most strings.
 
 Like any proper [POE::Filter](http://search.cpan.org/perldoc?POE::Filter), there are no POE-specific bits involved here
 \-- the filter can be used stand-alone to parse lines of IRC traffic (also see
-[IRC::Toolkit::Parser](http://search.cpan.org/perldoc?IRC::Toolkit::Parser)).
+[IRC::Toolkit::Parser](http://search.cpan.org/perldoc?IRC::Toolkit::Parser)). 
+
+In fact, you do not need [POE](http://search.cpan.org/perldoc?POE) installed -- if [POE::Filter](http://search.cpan.org/perldoc?POE::Filter) is not
+available, it is left out of `@ISA` and the filter will continue working
+normally.
 
 ## new
 
@@ -154,6 +158,8 @@ Major thanks to the `#ircv3` crew on irc.atheme.org, especially `Aerdan` and
 `grawity`, for various bits of inspiration.
 
 # SEE ALSO
+
+[IRC::Message::Object](http://search.cpan.org/perldoc?IRC::Message::Object)
 
 [POE::Filter](http://search.cpan.org/perldoc?POE::Filter)
 

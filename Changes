@@ -1,5 +1,11 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+0.045004 2013-12-02
+
+  - Drop 'strictures' & 'parent' dependencies
+
+  - POD / test improvements
+
 0.045003 2013-10-26
 
   - POE dependency is now optional
