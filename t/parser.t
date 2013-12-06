@@ -3,7 +3,7 @@ use lib 't/inc';
 use Test::More;
 use TestFilterHelpers;
 
-BEGIN { use_ok('POE::Filter::IRCv3') }
+use POE::Filter::IRCv3;
 
 my $show = shift @ARGV;
 
@@ -16,7 +16,7 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
     'cloned obj preserved colonify => 1';
 }
 
-# get_one_start/get_one
+# get_one_start/get_one/parse_one_line
 { my $line = ':test foo';
   warn "# >> '", $line, "'\n" if $show;
 
@@ -31,6 +31,12 @@ our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
         }
       ],
       'get_one_start/get_one ok'
+    );
+
+    is_deeply( 
+      POE::Filter::IRCv3::parse_one_line($line),
+      $ev->[0],
+      'parse_one_line ok'
     );
 
     $filter->get_one_start([ $line ]);

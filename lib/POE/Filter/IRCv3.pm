@@ -63,7 +63,7 @@ sub get {
   my @events;
   for my $raw_line (@{ $_[1] }) {
     warn " >> '$raw_line'\n" if $_[0]->[DEBUG];
-    if ( my $event = _parseline($raw_line) ) {
+    if ( my $event = parse_one_line($raw_line) ) {
       push @events, $event;
     } else {
       carp "Received malformed IRC input: $raw_line";
@@ -77,7 +77,7 @@ sub get_one {
   my @events;
   if ( my $raw_line = shift @{ $self->[BUFFER] } ) {
     warn " >> '$raw_line'\n" if $self->[DEBUG];
-    if ( my $event = _parseline($raw_line) ) {
+    if ( my $event = parse_one_line($raw_line) ) {
       push @events, $event;
     } else {
       warn "Received malformed IRC input: $raw_line\n";
@@ -140,7 +140,7 @@ sub put {
 }
 
 
-sub _parseline {
+sub parse_one_line {
   my $raw_line = $_[0];
   my %event = ( raw_line => $raw_line );
   my $pos = 0;
@@ -286,9 +286,11 @@ L<IRC::Toolkit::Parser>).
 
 In fact, you do not need L<POE> installed -- if L<POE::Filter> is not
 available, it is left out of C<@ISA> and the filter will continue working
-normally.
+normally. 
 
-=head2 new
+=head2 POE / Object interface
+
+=head3 new
 
 Construct a new Filter; if the B<colonify> option is true, 
 the last parameter will always have a colon prepended.
@@ -296,13 +298,13 @@ the last parameter will always have a colon prepended.
 B<colonify> as a method, or changed for specific events by passing a 
 B<colonify> option via events passed to L</put>.)
 
-=head2 get_one_start, get_one, get_pending
+=head3 get_one_start, get_one, get_pending
 
 Implement the interface described in L<POE::Filter>.
 
 See L</get>.
 
-=head2 get
+=head3 get
 
   my $events = $filter->get( [ $line, $another, ... ] );
   for my $event (@$events) {
@@ -313,26 +315,26 @@ See L</get>.
 Takes an ARRAY of raw lines and returns an ARRAY of HASH-type references with 
 the following keys:
 
-=head3 command
+=head4 command
 
 The (uppercased) command or numeric.
 
-=head3 params
+=head4 params
 
 An ARRAY containing the event parameters.
 
-=head3 prefix
+=head4 prefix
 
 The sender prefix, if any.
 
-=head3 tags
+=head4 tags
 
 A HASH of key => value pairs matching IRCv3.2 "message tags" -- see 
 L<http://ircv3.atheme.org>.
 
 Note that a tag can be present, but have an undefined value.
 
-=head2 put
+=head3 put
 
   my $lines = $filter->put( [ $hash, $another_hash, ... ] );
   for my $line (@$lines) {
@@ -342,7 +344,7 @@ Note that a tag can be present, but have an undefined value.
 Takes an ARRAY of HASH-type references matching those described in L</get> 
 (documented above) and returns an ARRAY of raw IRC-formatted lines.
 
-=head3 colonify
+=head4 colonify
 
 In addition to the keys described in L</get>, the B<colonify> option can be 
 specified for specific events. This controls whether or not the last 
@@ -353,17 +355,34 @@ Specify as part of the event hash:
 
   $filter->put([ { %event, colonify => 1 } ]);
 
-=head2 clone
+=head3 clone
 
 Copy the filter object (with a cleared buffer).
 
-=head2 debug
+=head3 debug
 
 Turn on/off debug output, which will display every input/output line (and
 possibly other data in the future).
 
 This is enabled by default at construction time if the environment variable
 C<POE_FILTER_IRC_DEBUG> is a true value.
+
+=head2 Functional interface
+
+If the filter is being used as a stand-alone IRC parser and speed is of the
+essence, you can skip method resolution & queue handling by calling the parse
+function directly using the fully-qualified name:
+
+  my $ev = POE::Filter::IRCv3::parse_one_line( $line );
+
+The function takes a single line and returns a single HASH whose structure is
+described in the documentation for L</get>, above.
+
+If the given line cannot be parsed, the function returns false (rather than
+throwing an exception, in contract to L</get>).
+
+There is currently no functional interface to message string composition
+(L</put>).
 
 =head1 AUTHOR
 
