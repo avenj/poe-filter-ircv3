@@ -273,6 +273,11 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
     Filters => [ $line, $ircd ],
   );
 
+  # Functional parser interface:
+  my $event = POE::Filter::IRCv3::parse_one_line(
+    ':foo PRIVMSG #bar :baz quux'
+  );
+
 =head1 DESCRIPTION
 
 A L<POE::Filter> for IRC traffic with support for IRCv3.2 message tags.
@@ -286,7 +291,7 @@ L<IRC::Toolkit::Parser>).
 
 In fact, you do not need L<POE> installed -- if L<POE::Filter> is not
 available, it is left out of C<@ISA> and the filter will continue working
-normally. 
+normally.
 
 =head2 POE / Object interface
 
@@ -375,11 +380,11 @@ function directly using the fully-qualified name:
 
   my $ev = POE::Filter::IRCv3::parse_one_line( $line );
 
-The function takes a single line and returns a single HASH whose structure is
+The function takes a single line and returns a HASH whose structure is
 described in the documentation for L</get>, above.
 
 If the given line cannot be parsed, the function returns false (rather than
-throwing an exception, in contract to L</get>).
+throwing an exception, as L</get> would).
 
 There is currently no functional interface to message string composition
 (L</put>).
