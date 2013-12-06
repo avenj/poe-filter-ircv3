@@ -52,6 +52,11 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
       Filters => [ $line, $ircd ],
     );
 
+    # Functional parser interface:
+    my $event = POE::Filter::IRCv3::parse_one_line(
+      ':foo PRIVMSG #bar :baz quux'
+    );
+
 # DESCRIPTION
 
 A [POE::Filter](http://search.cpan.org/perldoc?POE::Filter) for IRC traffic with support for IRCv3.2 message tags.
@@ -67,7 +72,9 @@ In fact, you do not need [POE](http://search.cpan.org/perldoc?POE) installed -- 
 available, it is left out of `@ISA` and the filter will continue working
 normally.
 
-## new
+## POE / Object interface
+
+### new
 
 Construct a new Filter; if the __colonify__ option is true, 
 the last parameter will always have a colon prepended.
@@ -75,13 +82,13 @@ the last parameter will always have a colon prepended.
 __colonify__ as a method, or changed for specific events by passing a 
 __colonify__ option via events passed to ["put"](#put).)
 
-## get\_one\_start, get\_one, get\_pending
+### get\_one\_start, get\_one, get\_pending
 
 Implement the interface described in [POE::Filter](http://search.cpan.org/perldoc?POE::Filter).
 
 See ["get"](#get).
 
-## get
+### get
 
     my $events = $filter->get( [ $line, $another, ... ] );
     for my $event (@$events) {
@@ -92,26 +99,26 @@ See ["get"](#get).
 Takes an ARRAY of raw lines and returns an ARRAY of HASH-type references with 
 the following keys:
 
-### command
+#### command
 
 The (uppercased) command or numeric.
 
-### params
+#### params
 
 An ARRAY containing the event parameters.
 
-### prefix
+#### prefix
 
 The sender prefix, if any.
 
-### tags
+#### tags
 
 A HASH of key => value pairs matching IRCv3.2 "message tags" -- see 
 [http://ircv3.atheme.org](http://ircv3.atheme.org).
 
 Note that a tag can be present, but have an undefined value.
 
-## put
+### put
 
     my $lines = $filter->put( [ $hash, $another_hash, ... ] );
     for my $line (@$lines) {
@@ -121,7 +128,7 @@ Note that a tag can be present, but have an undefined value.
 Takes an ARRAY of HASH-type references matching those described in ["get"](#get) 
 (documented above) and returns an ARRAY of raw IRC-formatted lines.
 
-### colonify
+#### colonify
 
 In addition to the keys described in ["get"](#get), the __colonify__ option can be 
 specified for specific events. This controls whether or not the last 
@@ -132,17 +139,36 @@ Specify as part of the event hash:
 
     $filter->put([ { %event, colonify => 1 } ]);
 
-## clone
+### clone
 
 Copy the filter object (with a cleared buffer).
 
-## debug
+### debug
 
 Turn on/off debug output, which will display every input/output line (and
 possibly other data in the future).
 
 This is enabled by default at construction time if the environment variable
 `POE_FILTER_IRC_DEBUG` is a true value.
+
+## Functional interface
+
+### parse\_one\_line
+
+If the filter is being used as a stand-alone IRC parser and speed is of the
+essence, you can skip method resolution & queue handling by calling the parse
+function directly using the fully-qualified name:
+
+    my $ev = POE::Filter::IRCv3::parse_one_line( $line );
+
+The function takes a single line and returns a HASH whose structure is
+described in the documentation for ["get"](#get), above.
+
+If the given line cannot be parsed, the function returns false (rather than
+throwing an exception, as ["get"](#get) would).
+
+There is currently no functional interface to message string composition
+(["put"](#put)).
 
 # AUTHOR
 
