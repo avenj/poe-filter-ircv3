@@ -374,6 +374,8 @@ C<POE_FILTER_IRC_DEBUG> is a true value.
 
 =head2 Functional interface
 
+=head3 parse_one_line
+
 If the filter is being used as a stand-alone IRC parser and speed is of the
 essence, you can skip method resolution & queue handling by calling the parse
 function directly using the fully-qualified name:
