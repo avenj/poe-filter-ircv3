@@ -10,7 +10,8 @@ my $show = shift @ARGV;
 our $filter = new_ok( 'POE::Filter::IRCv3' => [ colonify => 1 ] );
 
 ok $filter->debug(1) && $filter->debug,  '->debug accessor on';
-ok $filter->debug(0) && !$filter->debug, '->debug accessor off';
+$filter->debug(0);
+ok !$filter->debug, '->debug accessor off';
 
 # clone
 { my $clone = $filter->clone;
