@@ -12,6 +12,7 @@ my $line;
 
 # NUL, LF, SPACE, BELL
 $line = '@foo=bar\0\nbaz\squ\aux things';
+## FIXME full get tests
 get_tags_ok $filter, $line =>
   +{
     foo => "bar\0\nbaz qu\aux",
@@ -26,8 +27,9 @@ ok index($raw->[0], 'bar\0\nbaz\squ\aux') > -1,
 
 
 # SEMICOLON, BACKSLASH, CR
-$line = '@foo=bar\:\\baz\rquux stuff';
+$line = "\@foo=bar\\:\\\\baz\\rquux stuff";
 
+# FIXME full get tests
 get_tags_ok $filter, $line =>
   +{
     foo => "bar;\\baz\rquux",
