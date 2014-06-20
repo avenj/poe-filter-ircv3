@@ -102,7 +102,19 @@ sub get_one {
 
 
 use bytes;
+no warnings 'substr';
 
+sub escape_tag_chars {
+  my ($tag_value) = @_;
+  return unless defined $tag_value;
+  my $ret = '';
+  my $pos = 0;
+  while (defined(my $char = substr $tag_value, $pos++, 1)) {
+    $ret .= exists $CharToEscapedTag{$char} ? 
+      $CharToEscapedTag{$char} : $char
+  }
+  $ret
+}
 
 sub put {
   my ($self, $events) = @_;
@@ -116,14 +128,8 @@ sub put {
       if ( $event->{tags} && (my @tags = %{ $event->{tags} }) ) {
           $raw_line .= '@';
           while (my ($thistag, $thisval) = splice @tags, 0, 2) {
-            $raw_line .= $thistag . ( 
-              defined $thisval ? 
-                '=' . do { 
-                  $thisval =~ s/\Q$_/$CharToEscapedTag{$_}/g
-                    for keys %CharToEscapedTag;
-                  $thisval
-                }
-                : '' 
+            $raw_line .= $thistag . (
+              defined $thisval ? '=' . escape_tag_chars($thisval) : ''
             );
             $raw_line .= ';' if @tags;
           }
@@ -162,11 +168,17 @@ sub put {
 }
 
 
+sub parse_tag_line {
+  my $tag_line = $_[0];
+  my $pos = 0;
+  ## FIXME
+}
+
+
 sub parse_one_line {
   my $raw_line = $_[0];
   my %event = ( raw_line => $raw_line );
   my $pos = 0;
-  no warnings 'substr';
 
   ## We cheat a little; the spec is fuzzy when it comes to CR, LF, and NUL
   ## bytes. Theoretically they're not allowed inside messages, but
