@@ -247,7 +247,7 @@ unless caller; 1;
 
 =head1 NAME
 
-POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
+POE::Filter::IRCv3 - Fast IRCv3.2 parser
 
 =head1 SYNOPSIS
 
@@ -307,8 +307,9 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
 
 A L<POE::Filter> for IRC traffic with support for IRCv3.2 message tags.
 
-Does not rely on regular expressions for parsing, unlike many of its
-counterparts; benchmarks show this approach is slightly faster on most strings.
+Does not rely on regular expressions for parsing (unless tags are present --
+in which case escaping takes place via regex).  Benchmarks show this approach
+is slightly faster on most strings.
 
 Like any proper L<POE::Filter>, there are no POE-specific bits involved here
 -- the filter can be used stand-alone to parse lines of IRC traffic (also see
