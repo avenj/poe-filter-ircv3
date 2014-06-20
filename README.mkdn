@@ -1,6 +1,6 @@
 # NAME
 
-POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
+POE::Filter::IRCv3 - Fast IRCv3.2 parser
 
 # SYNOPSIS
 
@@ -41,7 +41,6 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
     );
 
 
-
     # Stacked with a line filter, suitable for Wheel usage, etc:
     my $ircd = POE::Filter::IRCv3->new(colonify => 1);
     my $line = POE::Filter::Line->new(
@@ -59,16 +58,17 @@ POE::Filter::IRCv3 - IRCv3.2 parser without regular expressions
 
 # DESCRIPTION
 
-A [POE::Filter](http://search.cpan.org/perldoc?POE::Filter) for IRC traffic with support for IRCv3.2 message tags.
+A [POE::Filter](https://metacpan.org/pod/POE::Filter) for IRC traffic with support for IRCv3.2 message tags.
 
-Does not rely on regular expressions for parsing, unlike many of its
-counterparts; benchmarks show this approach is slightly faster on most strings.
+Does not rely on regular expressions for parsing (unless tags are present --
+in which case escaping takes place via regex).  Benchmarks show this approach
+is slightly faster on most strings.
 
-Like any proper [POE::Filter](http://search.cpan.org/perldoc?POE::Filter), there are no POE-specific bits involved here
+Like any proper [POE::Filter](https://metacpan.org/pod/POE::Filter), there are no POE-specific bits involved here
 \-- the filter can be used stand-alone to parse lines of IRC traffic (also see
-[IRC::Toolkit::Parser](http://search.cpan.org/perldoc?IRC::Toolkit::Parser)). 
+[IRC::Toolkit::Parser](https://metacpan.org/pod/IRC::Toolkit::Parser)). 
 
-In fact, you do not need [POE](http://search.cpan.org/perldoc?POE) installed -- if [POE::Filter](http://search.cpan.org/perldoc?POE::Filter) is not
+In fact, you do not need [POE](https://metacpan.org/pod/POE) installed -- if [POE::Filter](https://metacpan.org/pod/POE::Filter) is not
 available, it is left out of `@ISA` and the filter will continue working
 normally.
 
@@ -76,15 +76,15 @@ normally.
 
 ### new
 
-Construct a new Filter; if the __colonify__ option is true, 
+Construct a new Filter; if the **colonify** option is true, 
 the last parameter will always have a colon prepended.
 (This setting can also be retrieved or changed on-the-fly by calling 
-__colonify__ as a method, or changed for specific events by passing a 
-__colonify__ option via events passed to ["put"](#put).)
+**colonify** as a method, or changed for specific events by passing a 
+**colonify** option via events passed to ["put"](#put).)
 
 ### get\_one\_start, get\_one, get\_pending
 
-Implement the interface described in [POE::Filter](http://search.cpan.org/perldoc?POE::Filter).
+Implement the interface described in [POE::Filter](https://metacpan.org/pod/POE::Filter).
 
 See ["get"](#get).
 
@@ -130,7 +130,7 @@ Takes an ARRAY of HASH-type references matching those described in ["get"](#get)
 
 #### colonify
 
-In addition to the keys described in ["get"](#get), the __colonify__ option can be 
+In addition to the keys described in ["get"](#get), the **colonify** option can be 
 specified for specific events. This controls whether or not the last 
 parameter will be colon-prefixed even if it is a single word. (Yes, IRC is 
 woefully inconsistent ...)
@@ -176,7 +176,7 @@ Jon Portnoy <avenj@cobaltirc.org>
 
 Licensed under the same terms as Perl.
 
-Original implementations were derived from [POE::Filter::IRCD](http://search.cpan.org/perldoc?POE::Filter::IRCD), 
+Original implementations were derived from [POE::Filter::IRCD](https://metacpan.org/pod/POE::Filter::IRCD), 
 which is copyright Chris Williams and Jonathan Steinert. This codebase has
 diverged significantly.
 
@@ -185,14 +185,14 @@ Major thanks to the `#ircv3` crew on irc.atheme.org, especially `Aerdan` and
 
 # SEE ALSO
 
-[IRC::Message::Object](http://search.cpan.org/perldoc?IRC::Message::Object)
+[IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object)
 
-[POE::Filter](http://search.cpan.org/perldoc?POE::Filter)
+[POE::Filter](https://metacpan.org/pod/POE::Filter)
 
-[POE::Filter::IRCD](http://search.cpan.org/perldoc?POE::Filter::IRCD)
+[POE::Filter::IRCD](https://metacpan.org/pod/POE::Filter::IRCD)
 
-[POE::Filter::Line](http://search.cpan.org/perldoc?POE::Filter::Line)
+[POE::Filter::Line](https://metacpan.org/pod/POE::Filter::Line)
 
-[POE::Filter::Stackable](http://search.cpan.org/perldoc?POE::Filter::Stackable)
+[POE::Filter::Stackable](https://metacpan.org/pod/POE::Filter::Stackable)
 
-[IRC::Toolkit](http://search.cpan.org/perldoc?IRC::Toolkit)
+[IRC::Toolkit](https://metacpan.org/pod/IRC::Toolkit)

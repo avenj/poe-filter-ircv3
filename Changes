@@ -1,5 +1,11 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+0.047001 2014-06-20
+
+  - Escape message tag values per ircv3-specifications issue #71
+
+  - Test coverage improvements
+
 0.046000 2013-12-06
 
   - Allow public access to the underlying parse function;
