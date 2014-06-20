@@ -178,9 +178,8 @@ sub parse_one_line {
   if ( substr($raw_line, 0, 1) eq '@' ) {
     return unless (my $nextsp = index($raw_line, SPCHR)) > 0;
     # Tag parser cheats and uses split, at the moment:
-    for my $tag_pair 
-      ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
-          my ($thistag, $thisval) = split /=/, $tag_pair;
+    for ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
+          my ($thistag, $thisval) = split /=/;
           my $realval;
           if (defined $thisval) {
             my $tag_pos = 0;
