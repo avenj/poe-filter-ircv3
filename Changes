@@ -1,5 +1,9 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+0.047002 2014-06-20
+
+  - Message tag escape/unescape optimizations
+
 0.047001 2014-06-20
 
   - Escape message tag values per ircv3-specifications issue #71
