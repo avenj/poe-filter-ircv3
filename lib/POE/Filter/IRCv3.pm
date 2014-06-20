@@ -102,7 +102,7 @@ sub get_one {
 
 
 use bytes;
-
+no warnings 'substr';
 
 sub put {
   my ($self, $events) = @_;
@@ -113,18 +113,21 @@ sub put {
     if ( ref $event eq 'HASH' ) {
       my $raw_line;
 
-      if ( $event->{tags} && (my @tags = %{ $event->{tags} }) ) {
+      ## FIXME this gets glacially slow ->
+      if ( exists $event->{tags} && (my @tags = %{ $event->{tags} }) ) {
           $raw_line .= '@';
           while (my ($thistag, $thisval) = splice @tags, 0, 2) {
-            $raw_line .= $thistag . ( 
-              defined $thisval ? 
-                '=' . do { 
-                  $thisval =~ s/\Q$_/$CharToEscapedTag{$_}/g
-                    for keys %CharToEscapedTag;
-                  $thisval
-                }
-                : '' 
-            );
+            $raw_line .= $thistag;
+            if (defined $thisval) {
+              $raw_line .= '=';
+              my $tag_pos = 0;
+              my $len = length $thisval;
+              while ($tag_pos < $len) {
+                my $ch = substr $thisval, $tag_pos++, 1;
+                $raw_line .= exists $CharToEscapedTag{$ch} ?
+                  $CharToEscapedTag{$ch} : $ch
+              }
+            }
             $raw_line .= ';' if @tags;
           }
           $raw_line .= ' ';
@@ -162,11 +165,11 @@ sub put {
 }
 
 
+
 sub parse_one_line {
   my $raw_line = $_[0];
   my %event = ( raw_line => $raw_line );
   my $pos = 0;
-  no warnings 'substr';
 
   ## We cheat a little; the spec is fuzzy when it comes to CR, LF, and NUL
   ## bytes. Theoretically they're not allowed inside messages, but
@@ -175,14 +178,29 @@ sub parse_one_line {
 
   if ( substr($raw_line, 0, 1) eq '@' ) {
     return unless (my $nextsp = index($raw_line, SPCHR)) > 0;
-    # Tag parser cheats and uses split & s//, at the moment:
+    # Tag parser cheats and uses split, at the moment:
     for my $tag_pair 
       ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
           my ($thistag, $thisval) = split /=/, $tag_pair;
+          my $realval;
           if (defined $thisval) {
-            $thisval =~ s/\Q$_/$EscapedTagToChar{$_}/g for keys %EscapedTagToChar
+            my $tag_pos = 0;
+            my $len = length $thisval;
+            while ($tag_pos < $len) {
+              my $ch = substr $thisval, $tag_pos++, 1;
+              if ($ch eq "\\") {
+                my $pair = $ch . (substr $thisval, $tag_pos++, 1 || '');
+                if (exists $EscapedTagToChar{$pair}) {
+                  $realval .= $EscapedTagToChar{$pair}
+                } else {
+                  $realval .= substr $pair, 1, 1;
+                }
+              } else {
+                $realval .= $ch
+              }
+            }
           }
-          $event{tags}->{$thistag} = $thisval
+          $event{tags}->{$thistag} = $realval
     }
     $pos = $nextsp + 1;
   }
