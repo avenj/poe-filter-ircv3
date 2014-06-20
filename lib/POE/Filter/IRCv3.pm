@@ -1,5 +1,7 @@
 package POE::Filter::IRCv3;
+
 use strict; use warnings FATAL => 'all';
+
 use Carp;
 
 BEGIN {
@@ -18,6 +20,18 @@ sub COLONIFY () { 0 }
 sub DEBUG    () { 1 }
 sub BUFFER   () { 2 }
 sub SPCHR    () { "\x20" }
+
+our %CharToEscapedTag = (
+  ';'  => '\:',
+  ' '  => '\s',
+  "\0" => '\0',
+  "\\" => '\\',
+  "\r" => '\r',
+  "\n" => '\n',
+  "\a" => '\a',
+);
+
+our %EscapedTagToChar = reverse %CharToEscapedTag;
 
 sub new {
   my ($class, %params) = @_;
@@ -102,7 +116,15 @@ sub put {
       if ( $event->{tags} && (my @tags = %{ $event->{tags} }) ) {
           $raw_line .= '@';
           while (my ($thistag, $thisval) = splice @tags, 0, 2) {
-            $raw_line .= $thistag . ( defined $thisval ? '='.$thisval : '' );
+            $raw_line .= $thistag . ( 
+              defined $thisval ? 
+                '=' . do { 
+                  $thisval =~ s/\Q$_/$CharToEscapedTag{$_}/g
+                    for keys %CharToEscapedTag;
+                  $thisval
+                }
+                : '' 
+            );
             $raw_line .= ';' if @tags;
           }
           $raw_line .= ' ';
@@ -153,10 +175,11 @@ sub parse_one_line {
 
   if ( substr($raw_line, 0, 1) eq '@' ) {
     return unless (my $nextsp = index($raw_line, SPCHR)) > 0;
-    # Tag parser cheats; split takes a pattern:
+    # Tag parser cheats and uses split & s//, at the moment:
     for my $tag_pair 
       ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
           my ($thistag, $thisval) = split /=/, $tag_pair;
+          $thisval =~ s/\Q$_/$EscapedTagToChar{$_}/g for keys %EscapedTagToChar;
           $event{tags}->{$thistag} = $thisval
     }
     $pos = $nextsp + 1;
