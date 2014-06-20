@@ -179,7 +179,9 @@ sub parse_one_line {
     for my $tag_pair 
       ( split /;/, substr $raw_line, 1, ($nextsp - 1) ) {
           my ($thistag, $thisval) = split /=/, $tag_pair;
-          $thisval =~ s/\Q$_/$EscapedTagToChar{$_}/g for keys %EscapedTagToChar;
+          if (defined $thisval) {
+            $thisval =~ s/\Q$_/$EscapedTagToChar{$_}/g for keys %EscapedTagToChar
+          }
           $event{tags}->{$thistag} = $thisval
     }
     $pos = $nextsp + 1;
