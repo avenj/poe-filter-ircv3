@@ -307,7 +307,7 @@ ok !$filter->debug, '->debug accessor off';
 }
 
 # Tags, no prefix
-{ my $line = '@foo=bar;znc.in/ext=val;baz'
+{ my $line = "\@foo=bar;znc.in/ext=val\0;baz"
             .' PRIVMSG #chan :A string';
 
   warn "# >> '", $line, "'\n" if $show;
@@ -327,7 +327,7 @@ ok !$filter->debug, '->debug accessor off';
     get_tags_ok $filter, $line =>
       +{
           foo          => 'bar',
-          'znc.in/ext' => 'val',
+          'znc.in/ext' => "val\0",
           'baz'        => undef,
       },
       'tags without prefix tags ok';
