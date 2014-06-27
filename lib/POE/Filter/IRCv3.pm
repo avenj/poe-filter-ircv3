@@ -145,6 +145,7 @@ sub put {
           }
           $raw_line .= ':'
             if (index($param, SPCHR) != -1)
+            or (index($param, ':') == 0)
             or (
               defined $event->{colonify} ?
               $event->{colonify} : $self->[COLONIFY]
