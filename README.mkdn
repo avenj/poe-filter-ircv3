@@ -1,6 +1,6 @@
 # NAME
 
-POE::Filter::IRCv3 - Fast IRCv3.2 parser
+POE::Filter::IRCv3 - Fast IRCv3.2 parser for POE or stand-alone use
 
 # SYNOPSIS
 
@@ -60,9 +60,8 @@ POE::Filter::IRCv3 - Fast IRCv3.2 parser
 
 A [POE::Filter](https://metacpan.org/pod/POE::Filter) for IRC traffic with support for IRCv3.2 message tags.
 
-Does not rely on regular expressions for parsing (unless tags are present --
-in which case escaping takes place via regex).  Benchmarks show this approach
-is slightly faster on most strings.
+Does not rely on regular expressions for parsing.  Benchmarks show this
+approach is generally faster on the most common IRC strings.
 
 Like any proper [POE::Filter](https://metacpan.org/pod/POE::Filter), there are no POE-specific bits involved here
 \-- the filter can be used stand-alone to parse lines of IRC traffic (also see

@@ -1,5 +1,15 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+1.001001 2014-08-16
+
+  - Single trailing param starting with ':' should prepend a ':'
+    Related bug in JS 'irc-message' (derived from this dist):
+    https://github.com/expr/irc-message/pull/12
+
+  - Minor optimizations
+
+  - Happy CPAN Day!
+
 0.047002 2014-06-20
 
   - Message tag escape/unescape optimizations
