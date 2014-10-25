@@ -460,4 +460,10 @@ L<POE::Filter::Stackable>
 
 L<IRC::Toolkit>
 
+There are also some similar IRC parsing implementations in other languages.
+
+JavaScript: L<< https://github.com/expr/irc-message >>
+
+Rust: L<< https://github.com/TyOverby/irc-message >>
+
 =cut

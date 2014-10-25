@@ -195,3 +195,9 @@ Major thanks to the `#ircv3` crew on irc.atheme.org, especially `Aerdan` and
 [POE::Filter::Stackable](https://metacpan.org/pod/POE::Filter::Stackable)
 
 [IRC::Toolkit](https://metacpan.org/pod/IRC::Toolkit)
+
+There are also some similar IRC parsing implementations in other languages.
+
+JavaScript: [https://github.com/expr/irc-message](https://github.com/expr/irc-message)
+
+Rust: [https://github.com/TyOverby/irc-message](https://github.com/TyOverby/irc-message)
