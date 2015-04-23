@@ -1,13 +1,6 @@
 package POE::Filter::IRCv3;
 
-use strict;
-
-use warnings FATAL => 'all';
-no warnings  FATAL => qw/
-  exec recursion internal malloc
-/;
-no warnings 'once';
-
+use strict; use warnings;
 
 use Carp;
 
