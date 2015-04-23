@@ -10,19 +10,19 @@ my $filter = POE::Filter::IRCv3->new;
 
 my $line;
 
-# NUL, LF, SPACE, BELL
-$line = '@foo=bar\0\nbaz\squ\aux things';
+# LF, SPACE, BELL
+$line = '@foo=bar\nbaz\squ\aux things';
 ## FIXME full get tests
 get_tags_ok $filter, $line =>
   +{
-    foo => "bar\0\nbaz qu\aux",
+    foo => "bar\nbaz qu\aux",
   },
-  'NUL, LF, SPACE, BELL escape ok';
+  'LF, SPACE, BELL escape ok';
 
 my $ev  = $filter->get([$line]);
 my $raw = $filter->put([@$ev]);
-ok index($raw->[0], 'bar\0\nbaz\squ\aux') > -1,
-  'roundtripped NUL, LF, SPACE, BELL'
+ok index($raw->[0], 'bar\nbaz\squ\aux') > -1,
+  'roundtripped LF, SPACE, BELL'
     or diag explain [ $ev, $raw ];
 
 
