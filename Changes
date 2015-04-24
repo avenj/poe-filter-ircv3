@@ -1,5 +1,13 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+1.002001 2015-04-23
+
+  - Remove '\0' escaping in tags, per ircv3-specifications GH #128
+
+  - Drop fatal warnings
+
+  - Switch to 'cpanfile' packaging
+
 1.001001 2014-08-16
 
   - Single trailing param starting with ':' should prepend a ':'
