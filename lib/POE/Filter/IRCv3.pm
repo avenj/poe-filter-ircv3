@@ -193,7 +193,7 @@ sub parse_one_line {
                 $realval .= exists $EscapedTagToChar{$pair} ?
                   $EscapedTagToChar{$pair}
                   : substr $pair, 1, 1;
-             } else {
+              } else {
                 $realval .= $ch
               }
             }
