@@ -34,11 +34,11 @@ our %EscapedTagToChar = reverse %CharToEscapedTag;
 
 sub new {
   my ($class, %params) = @_;
-  map {; $params{uc $_} = $params{$_} } keys %params;
+  $params{uc $_} = $params{$_} for keys %params;
   bless [
     ($params{'COLONIFY'} || 0),
     ($params{'DEBUG'}    || $ENV{POE_FILTER_IRC_DEBUG} || 0),
-    []  ## BUFFER
+    []      # BUFFER
   ], $class
 }
 
