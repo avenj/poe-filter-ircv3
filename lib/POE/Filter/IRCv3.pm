@@ -113,6 +113,8 @@ sub put {
       my $raw_line;
 
       ## FIXME this gets glacially slow ->
+      #  y// over string for escapes first and then loop?
+      #  
       if ( exists $event->{tags} && (my @tags = %{ $event->{tags} }) ) {
           $raw_line .= '@';
           while (my ($thistag, $thisval) = splice @tags, 0, 2) {
@@ -188,12 +190,10 @@ sub parse_one_line {
               my $ch = substr $thisval, $tag_pos++, 1;
               if ($ch eq "\\") {
                 my $pair = $ch . (substr $thisval, $tag_pos++, 1 || '');
-                if (exists $EscapedTagToChar{$pair}) {
-                  $realval .= $EscapedTagToChar{$pair}
-                } else {
-                  $realval .= substr $pair, 1, 1;
-                }
-              } else {
+                $realval .= exists $EscapedTagToChar{$pair} ?
+                  $EscapedTagToChar{$pair}
+                  : substr $pair, 1, 1;
+             } else {
                 $realval .= $ch
               }
             }
