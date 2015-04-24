@@ -4,6 +4,9 @@ use strict; use warnings;
 
 use Carp;
 
+# Not mandatory, but handy for POE apps, in which case POE is presumably
+# installed already; we can do all POE::Filter-y things, this only matters for
+# ->isa('POE::Filter') ->
 BEGIN {
   if (eval { require POE::Filter; 1 }) {
     our @ISA = 'POE::Filter';
@@ -49,28 +52,11 @@ sub clone {
   bless $nself, ref $self
 }
 
-sub debug {
-  my ($self, $value) = @_;
-  return $self->[DEBUG] = $value if defined $value;
-  $self->[DEBUG]
-}
+sub debug    { defined $_[1] ? $_[0]->[DEBUG] = $_[1] : $_[0]->[DEBUG] }
+sub colonify { defined $_[1] ? $_[0]->[COLONIFY] = $_[1] : $_[0]->[COLONIFY] }
 
-sub colonify {
-  my ($self, $value) = @_;
-  return $self->[COLONIFY] = $value if defined $value;
-  $self->[COLONIFY]
-}
-
-
-sub get_one_start {
-  my ($self, $raw_lines) = @_;
-  push @{ $self->[BUFFER] }, $_ for @$raw_lines;
-}
-
-sub get_pending {
-  my ($self) = @_;
-  @{ $self->[BUFFER] } ? [ @{ $self->[BUFFER] } ] : ()
-}
+sub get_one_start { push @{ $_[0]->[BUFFER] }, $_ for @{ $_[1] }; }
+sub get_pending   { @{ $_[0]->[BUFFER] } ? [ @{ $_[0]->[BUFFER] } ] : () }
 
 sub get {
   my @events;
@@ -458,11 +444,5 @@ L<POE::Filter::Line>
 L<POE::Filter::Stackable>
 
 L<IRC::Toolkit>
-
-There are also some similar IRC parsing implementations in other languages.
-
-JavaScript: L<< https://github.com/expr/irc-message >>
-
-Rust: L<< https://github.com/TyOverby/irc-message >>
 
 =cut
