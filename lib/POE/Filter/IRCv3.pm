@@ -65,6 +65,7 @@ sub get {
     if ( my $event = parse_one_line($raw_line) ) {
       push @events, $event;
     } else {
+      # carp here because caller provided lines:
       carp "Received malformed IRC input: $raw_line";
     }
   }
@@ -79,6 +80,7 @@ sub get_one {
     if ( my $event = parse_one_line($raw_line) ) {
       push @events, $event;
     } else {
+      # ..but warn here because who knows where the buffer came from:
       warn "Received malformed IRC input: $raw_line\n";
     }
   }
