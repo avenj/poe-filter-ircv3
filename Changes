@@ -1,5 +1,11 @@
 Revision history for Perl module POE::Filter::IRCv3
 
+1.002002 2015-06-17
+
+  - Tag parsing fix for partial escapes (bare '\')
+
+  - Minor optimizations
+
 1.002001 2015-04-23
 
   - Remove '\0' escaping in tags, per ircv3-specifications GH #128
