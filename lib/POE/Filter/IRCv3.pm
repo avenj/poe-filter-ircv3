@@ -177,7 +177,7 @@ sub parse_one_line {
             while ($tag_pos < $len) {
               my $ch = substr $thisval, $tag_pos++, 1;
               if ($ch eq "\\") {
-                my $pair = $ch . ( substr($thisval, $tag_pos++, 1) || '');
+                my $pair = $ch . (substr($thisval, $tag_pos++, 1) || '');
                 $realval .= exists $EscapedTagToChar{$pair} ?
                   $EscapedTagToChar{$pair}
                   : substr $pair, 1, 1;
