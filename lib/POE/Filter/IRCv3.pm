@@ -55,7 +55,7 @@ sub clone {
 sub debug    { defined $_[1] ? $_[0]->[DEBUG] = $_[1] : $_[0]->[DEBUG] }
 sub colonify { defined $_[1] ? $_[0]->[COLONIFY] = $_[1] : $_[0]->[COLONIFY] }
 
-sub get_one_start { push @{ $_[0]->[BUFFER] }, $_ for @{ $_[1] }; }
+sub get_one_start { push @{ $_[0]->[BUFFER] }, @{ $_[1] } }
 sub get_pending   { @{ $_[0]->[BUFFER] } ? [ @{ $_[0]->[BUFFER] } ] : () }
 
 sub get {
