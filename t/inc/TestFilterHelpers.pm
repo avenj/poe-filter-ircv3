@@ -54,8 +54,6 @@ Jon Portnoy <avenj@cobaltirc.org>
 
 
 use Test::Deep::NoTest qw/
-  cmp_deeply
-
   cmp_details
   deep_diag
 /;
